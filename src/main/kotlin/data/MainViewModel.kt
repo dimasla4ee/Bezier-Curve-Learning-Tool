@@ -1,11 +1,19 @@
 package data
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import utils.combinations
 import kotlin.math.pow
 
 class MainViewModel {
+    var scale by mutableStateOf(0.5f)
+        private set
+    val maxScale = 2f
+    val minScale = 0.2f
+
     private val pointsCap = 4
     val controlPoints = mutableStateListOf<EditablePoint>()
     val graphPoints: MutableList<Offset>
@@ -58,4 +66,10 @@ class MainViewModel {
     fun getControlPointsAsOffset(): List<Offset?> = controlPoints.map { it.toOffset() }
 
     fun getGraphPointsAsOffset(): List<Offset> = graphPoints
+
+    fun updateScale(newValue: Float) {
+        if (newValue in minScale..maxScale) {
+            scale = newValue
+        }
+    }
 }

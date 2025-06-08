@@ -107,6 +107,8 @@ fun App() {
                 BezierCurveGraph(
                     gridColor = AppColors.Divider,
                     controlPoints = viewModel.getControlPointsAsOffset(),
+                    scale = viewModel.scale,
+                    onScroll = { viewModel.updateScale(viewModel.scale - it * 0.05f) },
                     graphPoints = viewModel.getGraphPointsAsOffset()
                 )
 

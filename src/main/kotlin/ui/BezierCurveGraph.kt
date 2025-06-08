@@ -9,6 +9,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import utils.toScale
 
 @Composable
@@ -16,20 +18,37 @@ fun BezierCurveGraph(
     modifier: Modifier = Modifier,
     controlPoints: List<Offset?>,
     graphPoints: List<Offset>,
+    scale: Float,
+    onScroll: (Float) -> Unit,
     gridColor: Color = Color.Gray,
     gridStrokeWidth: Float = Stroke.HairlineWidth,
     axisStyle: AxisStyle = AxisStyle.Axis
 ) {
-    val scale = 50f
+    val cellSize = 100f
+    val scaledCellSize = cellSize * scale
 
-    Canvas(modifier.fillMaxSize()) {
-        drawGrid(scale, gridColor, gridStrokeWidth, axisStyle)
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        if (event.type == PointerEventType.Scroll) {
+                            val delta = event.changes.first().scrollDelta.y
+                            onScroll(delta)
+                        }
+                    }
+                }
+            },
+    ) {
+        drawGrid(scaledCellSize, gridColor, gridStrokeWidth, axisStyle)
 
         if (!controlPoints.contains(null)) {
-            drawCurve(graphPoints.map { it.toScale(center, scale) })
+            drawCurve(graphPoints.map { it.toScale(center, scaledCellSize) })
         }
         drawPoints(
-            points = controlPoints.filterNotNull().map { it.toScale(center, scale) },
+            points = controlPoints.filterNotNull().map { it.toScale(center, scaledCellSize) },
             pointMode = PointMode.Points,
             strokeWidth = 6f,
             color = Color.Red
