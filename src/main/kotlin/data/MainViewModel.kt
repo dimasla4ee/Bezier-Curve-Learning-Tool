@@ -9,14 +9,25 @@ import utils.combinations
 import kotlin.math.pow
 
 class MainViewModel {
+
+    companion object {
+        const val MAX_SCALE = 2f
+        const val MIN_SCALE = 0.2f
+        const val SCALE_MULTIPLIER = 0.05f
+        const val POINTS_CAP = 4
+    }
+
     var scale by mutableStateOf(0.5f)
         private set
-    val maxScale = 2f
-    val minScale = 0.2f
 
-    private val pointsCap = 4
+    var panningOffset = mutableStateOf(Offset(0f, 0f))
+        private set
+
     val controlPoints = mutableStateListOf<EditablePoint>()
+        private set
+
     val graphPoints: MutableList<Offset>
+        private set
         get() {
             val graphPoints = mutableStateListOf<Offset>()
             val parsedControlPoints = getControlPointsAsOffset()
@@ -38,7 +49,7 @@ class MainViewModel {
         }
 
     fun addPoint() {
-        if (controlPoints.size < pointsCap) {
+        if (controlPoints.size < POINTS_CAP) {
             controlPoints.add(
                 EditablePoint("", "")
             )
@@ -56,7 +67,7 @@ class MainViewModel {
     }
 
     fun updateY(index: Int, newValue: String) {
-        if (checkPattern(newValue) || newValue.isEmpty()) {
+        if (checkPattern(newValue)) {
             controlPoints[index] = controlPoints[index].copy(y = newValue)
         }
     }
@@ -67,8 +78,9 @@ class MainViewModel {
 
     fun getGraphPointsAsOffset(): List<Offset> = graphPoints
 
-    fun updateScale(newValue: Float) {
-        if (newValue in minScale..maxScale) {
+    fun updateScale(delta: Float) {
+        val newValue = scale - delta * SCALE_MULTIPLIER
+        if (newValue in MIN_SCALE..MAX_SCALE) {
             scale = newValue
         }
     }

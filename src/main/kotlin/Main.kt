@@ -108,7 +108,7 @@ fun App() {
                     gridColor = AppColors.Divider,
                     controlPoints = viewModel.getControlPointsAsOffset(),
                     scale = viewModel.scale,
-                    onScroll = { viewModel.updateScale(viewModel.scale - it * 0.05f) },
+                    onScroll = { viewModel.updateScale(it) },
                     graphPoints = viewModel.getGraphPointsAsOffset()
                 )
 
