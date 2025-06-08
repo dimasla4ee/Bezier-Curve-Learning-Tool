@@ -24,10 +24,8 @@ class MainViewModel {
         private set
 
     val controlPoints = mutableStateListOf<EditablePoint>()
-        private set
 
     val graphPoints: MutableList<Offset>
-        private set
         get() {
             val graphPoints = mutableStateListOf<Offset>()
             val parsedControlPoints = getControlPointsAsOffset()
