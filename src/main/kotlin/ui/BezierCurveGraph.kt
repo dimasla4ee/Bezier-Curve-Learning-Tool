@@ -1,8 +1,9 @@
 package ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -10,15 +11,19 @@ import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isTertiaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import utils.toScale
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BezierCurveGraph(
     modifier: Modifier = Modifier,
     controlPoints: List<Offset?>,
     graphPoints: List<Offset>,
     scale: Float,
+    offset: Offset,
+    onDrag: (Offset) -> Unit,
     onScroll: (Float) -> Unit,
     gridColor: Color = Color.Gray,
     gridStrokeWidth: Float = Stroke.HairlineWidth,
@@ -26,6 +31,8 @@ fun BezierCurveGraph(
 ) {
     val cellSize = 100f
     val scaledCellSize = cellSize * scale
+    var isDragging by remember { mutableStateOf(false) }
+    var dragOffset by mutableStateOf(offset)
 
     Canvas(
         modifier = modifier
@@ -34,21 +41,42 @@ fun BezierCurveGraph(
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent()
-                        if (event.type == PointerEventType.Scroll) {
-                            val delta = event.changes.first().scrollDelta.y
-                            onScroll(delta)
+                        val change = event.changes.first()
+                        isDragging = event.buttons.isTertiaryPressed
+
+                        when (event.type) {
+                            PointerEventType.Move -> {
+                                if (isDragging) {
+                                    val delta = change.position - change.previousPosition
+                                    dragOffset += delta
+                                    onDrag(dragOffset)
+                                }
+                            }
+
+                            PointerEventType.Scroll -> {
+                                val delta = change.scrollDelta.y
+                                onScroll(delta)
+                            }
                         }
                     }
                 }
-            },
+            }
     ) {
-        drawGrid(scaledCellSize, gridColor, gridStrokeWidth, axisStyle)
+        drawGrid(scaledCellSize, offset, gridColor, gridStrokeWidth, axisStyle)
 
         if (!controlPoints.contains(null)) {
-            drawCurve(graphPoints.map { it.toScale(center, scaledCellSize) })
+            drawCurve(
+                graphPoints.map { graphPoint ->
+                    graphPoint.toScale(
+                        origin = center + offset,
+                        scale = scaledCellSize
+                    )
+                }
+            )
         }
+
         drawPoints(
-            points = controlPoints.filterNotNull().map { it.toScale(center, scaledCellSize) },
+            points = controlPoints.filterNotNull().map { it.toScale(center + offset, scaledCellSize) },
             pointMode = PointMode.Points,
             strokeWidth = 6f,
             color = Color.Red
@@ -63,11 +91,14 @@ enum class AxisStyle {
 
 fun DrawScope.drawGrid(
     scale: Float,
+    offset: Offset,
     color: Color = Color.Gray,
     strokeWidth: Float = Stroke.HairlineWidth,
     axisStyle: AxisStyle = AxisStyle.Axis
 ) {
-    var x = center.x - (center.x / scale).toInt() * scale
+    var x = (center.x + offset.x) - ((center.x + offset.x) / scale).toInt() * scale
+    var y = (center.y + offset.y) - ((center.y + offset.y) / scale).toInt() * scale
+
     while (x < size.width) {
         drawLine(
             color = color,
@@ -78,7 +109,6 @@ fun DrawScope.drawGrid(
         x += scale
     }
 
-    var y = center.y - (center.y / scale).toInt() * scale
     while (y < size.height) {
         drawLine(
             color = color,
@@ -92,21 +122,21 @@ fun DrawScope.drawGrid(
     if (axisStyle != AxisStyle.NoAxis) {
         drawLine(
             color = Color.Black,
-            start = center.copy(x = 0f),
-            end = center.copy(x = size.width),
+            start = Offset(0f, center.y + offset.y),
+            end = Offset(size.width, center.y + offset.y),
             strokeWidth = strokeWidth
         )
         drawLine(
             color = Color.Black,
-            start = center.copy(y = 0f),
-            end = center.copy(y = size.height),
+            start = Offset(center.x + offset.x, 0f),
+            end = Offset(center.x + offset.x, size.height),
             strokeWidth = strokeWidth
         )
     }
 }
 
 fun DrawScope.drawCurve(
-    points: List<Offset>,
+    points: List<Offset>
 ) {
     for (i in 0..<points.lastIndex) {
         drawLine(

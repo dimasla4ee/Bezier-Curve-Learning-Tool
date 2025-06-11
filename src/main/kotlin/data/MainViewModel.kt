@@ -20,7 +20,7 @@ class MainViewModel {
     var scale by mutableStateOf(0.5f)
         private set
 
-    var panningOffset = mutableStateOf(Offset(0f, 0f))
+    var panningOffset by mutableStateOf(Offset(0f, 0f))
         private set
 
     val controlPoints = mutableStateListOf<EditablePoint>()
@@ -78,8 +78,10 @@ class MainViewModel {
 
     fun updateScale(delta: Float) {
         val newValue = scale - delta * SCALE_MULTIPLIER
-        if (newValue in MIN_SCALE..MAX_SCALE) {
-            scale = newValue
-        }
+        scale = newValue.coerceIn(MIN_SCALE..MAX_SCALE)
+    }
+
+    fun updatePanningOffset(newValue: Offset) {
+        panningOffset = newValue
     }
 }
