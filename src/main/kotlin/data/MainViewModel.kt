@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
-import utils.combinations
+import utils.binomialCoefficients
 import kotlin.math.pow
 
 class MainViewModel {
@@ -38,7 +38,7 @@ class MainViewModel {
                 var b = Offset(0f, 0f)
                 val n = parsedControlPoints.size - 1
                 for (i in 0..n) {
-                    b += parsedControlPoints[i]!! * (combinations(n, i)
+                    b += parsedControlPoints[i]!! * (binomialCoefficients(n, i)
                             * (t / 100f).pow(i) * (1 - t / 100f).pow(n - i))
                 }
                 graphPoints.add(b)
@@ -60,13 +60,13 @@ class MainViewModel {
 
     fun updateX(index: Int, newValue: String) {
         if (checkPattern(newValue)) {
-            controlPoints[index] = controlPoints[index].copy(x = newValue)
+            controlPoints[index] = controlPoints[index].copy(xInput = newValue)
         }
     }
 
     fun updateY(index: Int, newValue: String) {
         if (checkPattern(newValue)) {
-            controlPoints[index] = controlPoints[index].copy(y = newValue)
+            controlPoints[index] = controlPoints[index].copy(yInput = newValue)
         }
     }
 

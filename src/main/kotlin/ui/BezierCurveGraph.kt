@@ -19,25 +19,26 @@ import utils.toScale
 @Composable
 fun BezierCurveGraph(
     modifier: Modifier = Modifier,
-    controlPoints: List<Offset?>,
-    graphPoints: List<Offset>,
+    controlPoints: List<Offset?>,           // Initial control points
+    graphPoints: List<Offset>,              // Calculated Bezier curve points
     scale: Float,
-    offset: Offset,
-    onDrag: (Offset) -> Unit,
-    onScroll: (Float) -> Unit,
+    panOffset: Offset,
+    onDrag: (Offset) -> Unit,               // Panning callback
+    onScroll: (Float) -> Unit,              // Zoom callback
     gridColor: Color = Color.Gray,
     gridStrokeWidth: Float = Stroke.HairlineWidth,
     axisStyle: AxisStyle = AxisStyle.Axis
 ) {
-    val cellSize = 100f
-    val scaledCellSize = cellSize * scale
+    val baseCellSize = 100f
+    val cellSizeScaled = baseCellSize * scale
     var isDragging by remember { mutableStateOf(false) }
-    var dragOffset by mutableStateOf(offset)
+    var localPanOffset by mutableStateOf(panOffset)
 
     Canvas(
         modifier = modifier
             .fillMaxSize()
             .pointerInput(Unit) {
+                // Panning and zoom interaction
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent()
@@ -48,8 +49,8 @@ fun BezierCurveGraph(
                             PointerEventType.Move -> {
                                 if (isDragging) {
                                     val delta = change.position - change.previousPosition
-                                    dragOffset += delta
-                                    onDrag(dragOffset)
+                                    localPanOffset += delta
+                                    onDrag(localPanOffset)
                                 }
                             }
 
@@ -62,21 +63,27 @@ fun BezierCurveGraph(
                 }
             }
     ) {
-        drawGrid(scaledCellSize, offset, gridColor, gridStrokeWidth, axisStyle)
+        drawGrid(
+            cellSize = cellSizeScaled,
+            panOffset = panOffset,
+            color = gridColor,
+            strokeWidth = gridStrokeWidth,
+            axisStyle = axisStyle
+        )
 
         if (!controlPoints.contains(null)) {
             drawCurve(
                 graphPoints.map { graphPoint ->
                     graphPoint.toScale(
-                        origin = center + offset,
-                        scale = scaledCellSize
+                        screenCenterWithPan = center + panOffset,
+                        cellSize = cellSizeScaled
                     )
                 }
             )
         }
 
         drawPoints(
-            points = controlPoints.filterNotNull().map { it.toScale(center + offset, scaledCellSize) },
+            points = controlPoints.filterNotNull().map { it.toScale(center + panOffset, cellSizeScaled) },
             pointMode = PointMode.Points,
             strokeWidth = 6f,
             color = Color.Red
@@ -90,59 +97,61 @@ enum class AxisStyle {
 }
 
 fun DrawScope.drawGrid(
-    scale: Float,
-    offset: Offset,
+    cellSize: Float,
+    panOffset: Offset,
     color: Color = Color.Gray,
     strokeWidth: Float = Stroke.HairlineWidth,
     axisStyle: AxisStyle = AxisStyle.Axis
 ) {
-    var x = (center.x + offset.x) - ((center.x + offset.x) / scale).toInt() * scale
-    var y = (center.y + offset.y) - ((center.y + offset.y) / scale).toInt() * scale
+    // Initial values for x and y to align axis with center
+    var gridX = (center.x + panOffset.x) - ((center.x + panOffset.x) / cellSize).toInt() * cellSize
+    var gridY = (center.y + panOffset.y) - ((center.y + panOffset.y) / cellSize).toInt() * cellSize
 
-    while (x < size.width) {
+    // Draw grid
+    while (gridX < size.width) {
         drawLine(
             color = color,
-            start = Offset(x, 0f),
-            end = Offset(x, size.height),
+            start = Offset(gridX, 0f),
+            end = Offset(gridX, size.height),
             strokeWidth = strokeWidth
         )
-        x += scale
+        gridX += cellSize
     }
-
-    while (y < size.height) {
+    while (gridY < size.height) {
         drawLine(
             color = color,
-            start = Offset(0f, y),
-            end = Offset(size.width, y),
+            start = Offset(0f, gridY),
+            end = Offset(size.width, gridY),
             strokeWidth = strokeWidth
         )
-        y += scale
+        gridY += cellSize
     }
 
+    // Draw axis
     if (axisStyle != AxisStyle.NoAxis) {
         drawLine(
             color = Color.Black,
-            start = Offset(0f, center.y + offset.y),
-            end = Offset(size.width, center.y + offset.y),
+            start = Offset(0f, center.y + panOffset.y),
+            end = Offset(size.width, center.y + panOffset.y),
             strokeWidth = strokeWidth
         )
         drawLine(
             color = Color.Black,
-            start = Offset(center.x + offset.x, 0f),
-            end = Offset(center.x + offset.x, size.height),
+            start = Offset(center.x + panOffset.x, 0f),
+            end = Offset(center.x + panOffset.x, size.height),
             strokeWidth = strokeWidth
         )
     }
 }
 
 fun DrawScope.drawCurve(
-    points: List<Offset>
+    curvePoints: List<Offset>
 ) {
-    for (i in 0..<points.lastIndex) {
+    for (i in 0..<curvePoints.lastIndex) {
         drawLine(
             color = Color.Blue,
-            start = points[i],
-            end = points[i + 1]
+            start = curvePoints[i],
+            end = curvePoints[i + 1]
         )
     }
 }

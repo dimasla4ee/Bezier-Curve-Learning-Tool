@@ -15,6 +15,19 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 
+/**
+ * A [Text] wrapper which displays a text followed by a numeric index,
+ * where the index is styled with a separate font size.
+ *
+ * All the standard [Text] parameters are supported and forwarded.
+ * Refer to [androidx.compose.material.Text] documentation for full parameter details.
+ *
+ * @param text the main text to display.
+ * @param index the index number to append after the text.
+ * @param fontSize the font size of the main text.
+ * @param indexFontSize the font size of the index.
+ * @see [Text]
+ */
 @Composable
 fun IndexedText(
     text: String,
@@ -42,8 +55,14 @@ fun IndexedText(
         text = buildAnnotatedString {
             append(text)
 
-            withStyle(SpanStyle(fontSize = indexFontSize)) {
-                append(index.toString())
+            withStyle(
+                SpanStyle(
+                    fontSize = indexFontSize
+                )
+            ) {
+                append(
+                    index.toString()
+                )
             }
         },
         modifier = modifier,

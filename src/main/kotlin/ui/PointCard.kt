@@ -81,7 +81,7 @@ fun PointCard(
             )
             NumericTextField(
                 modifier = Modifier.width(AppDimensions.TextFieldWidth),
-                value = point.x,
+                value = point.xInput,
                 interactionSource = interactionSource,
                 onValueChange = onXChange
             )
@@ -93,7 +93,7 @@ fun PointCard(
             )
             NumericTextField(
                 modifier = Modifier.width(AppDimensions.TextFieldWidth),
-                value = point.y,
+                value = point.yInput,
                 interactionSource = interactionSource,
                 onValueChange = onYChange
             )
