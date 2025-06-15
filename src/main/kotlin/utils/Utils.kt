@@ -17,9 +17,11 @@ fun binomialCoefficients(n: Int, r: Int): Int = factorial(n) / (factorial(r) * f
  */
 fun factorial(n: Int): Int {
     require(n >= 0)
-    return (1..n).reduce { previousValue, currentValue ->
-        previousValue * currentValue
+    var factorial = 1
+    for (i in 1..n) {
+        factorial *= i
     }
+    return factorial
 }
 
 /**
