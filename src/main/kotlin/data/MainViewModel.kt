@@ -15,6 +15,7 @@ class MainViewModel {
         const val MIN_SCALE = 0.2f
         const val SCALE_MULTIPLIER = 0.05f
         const val POINTS_CAP = 4
+        const val POINT_PER_POINT = 15
     }
 
     var scale by mutableStateOf(0.5f)
@@ -27,24 +28,41 @@ class MainViewModel {
 
     val graphPoints: MutableList<Offset>
         get() {
-            val graphPoints = mutableStateListOf<Offset>()
             val parsedControlPoints = getControlPointsAsOffset()
-
             if (parsedControlPoints.contains(null)) {
-                return graphPoints
+                return mutableListOf()
             }
 
-            for (t in 1..100) {
-                var b = Offset(0f, 0f)
-                val n = parsedControlPoints.size - 1
-                for (i in 0..n) {
-                    b += parsedControlPoints[i]!! * (binomialCoefficients(n, i)
-                            * (t / 100f).pow(i) * (1 - t / 100f).pow(n - i))
-                }
-                graphPoints.add(b)
+            val points = parsedControlPoints.filterNotNull()
+            if (points.size < 2) {
+                return mutableListOf()
             }
-            return graphPoints
+
+            val n = points.lastIndex
+            val steps = (POINT_PER_POINT * n).coerceAtLeast(2)
+
+            val result = mutableStateListOf<Offset>()
+
+            for (tStep in 0..steps) {
+                val t = tStep / steps.toFloat()
+                val point = findBezierPoint(t, points)
+
+                result.add(point)
+            }
+
+            return result
         }
+
+    fun findBezierPoint(t: Float, points: List<Offset>): Offset {
+        var point = Offset.Zero
+        val n = points.lastIndex
+
+        for (i in 0..n) {
+            point += points[i] * binomialCoefficients(n, i).toFloat() * t.pow(i) * (1 - t).pow(n - i)
+        }
+
+        return point
+    }
 
     fun addPoint() {
         if (controlPoints.size < POINTS_CAP) {
