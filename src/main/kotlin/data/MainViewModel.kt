@@ -37,7 +37,7 @@ class MainViewModel {
         private set
 
     /** List of editable control points as entered by the user. */
-    private val controlPoints = mutableStateListOf<EditablePoint>()
+    val controlPoints = mutableStateListOf<EditablePoint>()
 
     /**
      * Generates a list of points along the Bézier curve based on current control points.
@@ -133,7 +133,7 @@ class MainViewModel {
     fun getControlPointOffsets(): List<Offset?> = controlPoints.map { it.toOffset() }
 
     /** Returns the list of Bézier curve points. */
-    fun getGraphPoints(): List<Offset> = graphPoints
+    fun getGraphPointOffsets(): List<Offset> = graphPoints
 
     /**
      * Updates the current zoom level based on scroll delta input.

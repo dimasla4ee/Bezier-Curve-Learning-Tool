@@ -106,12 +106,12 @@ fun App() {
             ) {
                 BezierCurveGraph(
                     gridColor = AppColors.Divider,
-                    controlPoints = viewModel.getControlPointsAsOffset(),
+                    controlPoints = viewModel.getControlPointOffsets(),
                     scale = viewModel.scale,
                     panOffset = viewModel.panningOffset,
                     onDrag = { viewModel.updatePanningOffset(it) },
                     onScroll = { viewModel.updateScale(it) },
-                    graphPoints = viewModel.getGraphPointsAsOffset()
+                    graphPoints = viewModel.getGraphPointOffsets()
                 )
 
                 if (drawerState.isClosed) {
