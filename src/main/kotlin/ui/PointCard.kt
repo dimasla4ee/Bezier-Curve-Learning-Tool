@@ -1,8 +1,6 @@
 package ui
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -12,6 +10,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -20,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.unit.Dp.Companion.Unspecified
 import androidx.compose.ui.unit.dp
 import data.EditablePoint
 import resources.AppColors
@@ -37,13 +35,17 @@ fun PointCard(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+    val isError = point.toOffset() == null
 
-    val headerColor = if (isFocused) AppColors.Primary else AppColors.SurfaceVariant
-    val textColor = if (isFocused) AppColors.OnPrimary else AppColors.OnSurfaceVariant
-    val dividerWidth = if (isFocused) 1.dp else Unspecified
+    val headerColor = when {
+        isFocused -> AppColors.Primary
+        isError -> AppColors.Error
+        else -> AppColors.SurfaceVariant
+    }
+    val textColor = if (isFocused || isError) AppColors.OnPrimary else AppColors.OnSurfaceVariant
 
     Row(
-        modifier = modifier.border(BorderStroke(dividerWidth, headerColor)),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
@@ -51,23 +53,35 @@ fun PointCard(
                 .background(headerColor)
                 .fillMaxHeight()
                 .padding(horizontal = AppDimensions.SmallPadding)
-                .wrapContentWidth(),
-            horizontalArrangement = Arrangement.End,
+                .width(18.dp),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IndexedText(
-                text = "P",
-                index = pointIndex,
-                color = textColor,
-                fontStyle = FontStyle.Italic,
-                fontFamily = FontFamily.Serif,
-                fontSize = AppDimensions.RegularText,
-                indexFontSize = AppDimensions.SmallText
-            )
+            if (isError) {
+                Tooltip("Введите вещественное значение для x и y") {
+                    Icon(
+                        modifier = Modifier.size(16.dp),
+                        imageVector = Icons.Outlined.Warning,
+                        tint = textColor,
+                        contentDescription = "Error"
+                    )
+                }
+            } else {
+                IndexedText(
+                    text = "P",
+                    index = pointIndex,
+                    color = textColor,
+                    fontStyle = FontStyle.Italic,
+                    fontFamily = FontFamily.Serif,
+                    fontSize = AppDimensions.RegularText,
+                    indexFontSize = AppDimensions.SmallText
+                )
+            }
         }
 
         Row(
             Modifier
+                .background(headerColor.copy(alpha = 0.2f))
                 .padding(horizontal = AppDimensions.SmallPadding)
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,

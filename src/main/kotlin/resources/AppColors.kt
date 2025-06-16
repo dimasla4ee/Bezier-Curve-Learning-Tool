@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 object AppColors {
     val Primary = Color(18, 115, 226)
     val OnPrimary = Color(255, 255, 255)
+    val Error = Color(225, 0, 0)
 
     val Surface = Color(255, 255, 255)
     val SurfaceVariant = Color(241, 241, 242)
