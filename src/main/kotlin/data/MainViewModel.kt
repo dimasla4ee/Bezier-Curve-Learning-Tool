@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import data.MainViewModel.Companion.POINTS_CAP
 import utils.binomialCoefficients
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import kotlin.math.pow
 
 class MainViewModel {
@@ -26,6 +28,8 @@ class MainViewModel {
 
         /** Number of curve steps per control point (controls smoothness). */
         const val STEPS_PER_POINT = 15
+
+        const val BASE_CELL_SIZE = 100f
     }
 
     /** Current zoom level applied to the graph view. */
@@ -34,6 +38,9 @@ class MainViewModel {
 
     /** Current pan offset applied to the graph view. */
     var panningOffset by mutableStateOf(Offset(0f, 0f))
+        private set
+
+    var scaledCellSize by mutableStateOf(BASE_CELL_SIZE * scale)
         private set
 
     /** List of editable control points as entered by the user. */
@@ -97,6 +104,21 @@ class MainViewModel {
         }
     }
 
+    fun addPointAt(position: Offset, cellSize: Float) {
+        if (controlPoints.size < POINTS_CAP) {
+            val point = position / cellSize
+            val decimalFormat = DecimalFormat("##.##").apply {
+                roundingMode = RoundingMode.DOWN
+            }
+            controlPoints.add(
+                EditablePoint(
+                    decimalFormat.format(point.x).toString().replace('.', ','),
+                    decimalFormat.format(-point.y).toString().replace('.', ',')
+                )
+            )
+        }
+    }
+
     /** Removes a control point at the specified [index]. */
     fun removePoint(index: Int) {
         controlPoints.removeAt(index)
@@ -143,12 +165,15 @@ class MainViewModel {
     fun updateScale(delta: Float) {
         val newValue = scale - delta * SCALE_MULTIPLIER
         scale = newValue.coerceIn(MIN_SCALE..MAX_SCALE)
+        scaledCellSize = BASE_CELL_SIZE * scale
     }
 
     /**
      * Updates the pan offset used to shift the graph.
+     *
+     * @param delta the difference between the previous and new mouse positions.
      */
-    fun updatePanningOffset(newValue: Offset) {
-        panningOffset = newValue
+    fun updatePanningOffset(delta: Offset) {
+        panningOffset += delta
     }
 }

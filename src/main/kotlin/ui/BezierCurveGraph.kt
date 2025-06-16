@@ -3,16 +3,13 @@ package ui
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.isTertiaryPressed
-import androidx.compose.ui.input.pointer.pointerInput
 import utils.toScale
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -21,50 +18,17 @@ fun BezierCurveGraph(
     modifier: Modifier = Modifier,
     controlPoints: List<Offset?>,           // Initial control points
     graphPoints: List<Offset>,              // Calculated Bezier curve points
-    scale: Float,
+    cellSize: Float,
     panOffset: Offset,
-    onDrag: (Offset) -> Unit,               // Panning callback
-    onScroll: (Float) -> Unit,              // Zoom callback
     gridColor: Color = Color.Gray,
     gridStrokeWidth: Float = Stroke.HairlineWidth,
     axisStyle: AxisStyle = AxisStyle.Axis
 ) {
-    val baseCellSize = 100f
-    val cellSizeScaled = baseCellSize * scale
-    var isDragging by remember { mutableStateOf(false) }
-    var localPanOffset by mutableStateOf(panOffset)
-
     Canvas(
-        modifier = modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                // Panning and zoom interaction
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        val change = event.changes.first()
-                        isDragging = event.buttons.isTertiaryPressed
-
-                        when (event.type) {
-                            PointerEventType.Move -> {
-                                if (isDragging) {
-                                    val delta = change.position - change.previousPosition
-                                    localPanOffset += delta
-                                    onDrag(localPanOffset)
-                                }
-                            }
-
-                            PointerEventType.Scroll -> {
-                                val delta = change.scrollDelta.y
-                                onScroll(delta)
-                            }
-                        }
-                    }
-                }
-            }
+        modifier = modifier.fillMaxSize()
     ) {
         drawGrid(
-            cellSize = cellSizeScaled,
+            cellSize = cellSize,
             panOffset = panOffset,
             color = gridColor,
             strokeWidth = gridStrokeWidth,
@@ -72,18 +36,11 @@ fun BezierCurveGraph(
         )
 
         if (!controlPoints.contains(null)) {
-            drawCurve(
-                graphPoints.map { graphPoint ->
-                    graphPoint.toScale(
-                        screenCenterWithPan = center + panOffset,
-                        cellSize = cellSizeScaled
-                    )
-                }
-            )
+            drawCurve(graphPoints.map { it.toScale(center + panOffset, cellSize) })
         }
 
         drawPoints(
-            points = controlPoints.filterNotNull().map { it.toScale(center + panOffset, cellSizeScaled) },
+            points = controlPoints.filterNotNull().map { it.toScale(center + panOffset, cellSize) },
             pointMode = PointMode.Points,
             strokeWidth = 6f,
             color = Color.Red

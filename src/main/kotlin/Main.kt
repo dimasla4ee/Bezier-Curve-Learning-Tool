@@ -7,11 +7,16 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isPrimaryPressed
+import androidx.compose.ui.input.pointer.isTertiaryPressed
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 import data.MainViewModel
@@ -100,17 +105,54 @@ fun App() {
                 }
             },
         ) {
+            var isDragging by remember { mutableStateOf(false) }
+            val canvasSize = remember { mutableStateOf(IntSize.Zero) }
+
             Surface(
                 shape = RoundedCornerShape(AppDimensions.MediumRadius),
                 border = BorderStroke(1.dp, AppColors.SurfaceDivider)
             ) {
                 BezierCurveGraph(
+                    modifier = Modifier
+                        .onSizeChanged { canvasSize.value = it }
+                        .pointerInput(Unit) {
+                            // Panning and zoom interaction
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    val change = event.changes.first()
+                                    val center = Offset(canvasSize.value.width / 2f, canvasSize.value.height / 2f)
+                                    isDragging = event.buttons.isTertiaryPressed
+
+                                    when (event.type) {
+                                        PointerEventType.Press -> {
+                                            if (event.buttons.isPrimaryPressed) {
+                                                viewModel.addPointAt(
+                                                    change.position - (center + viewModel.panningOffset),
+                                                    viewModel.scaledCellSize
+                                                )
+                                            }
+                                        }
+
+                                        PointerEventType.Move -> {
+                                            if (isDragging) {
+                                                val delta = change.position - change.previousPosition
+                                                viewModel.updatePanningOffset(delta)
+                                            }
+                                        }
+
+                                        PointerEventType.Scroll -> {
+                                            val delta = change.scrollDelta.y
+                                            viewModel.updateScale(delta)
+                                        }
+                                    }
+                                }
+                            }
+                        },
                     gridColor = AppColors.Divider,
                     controlPoints = viewModel.getControlPointOffsets(),
-                    scale = viewModel.scale,
+                    cellSize = viewModel.scaledCellSize,
                     panOffset = viewModel.panningOffset,
-                    onDrag = { viewModel.updatePanningOffset(it) },
-                    onScroll = { viewModel.updateScale(it) },
                     graphPoints = viewModel.getGraphPointOffsets()
                 )
 
