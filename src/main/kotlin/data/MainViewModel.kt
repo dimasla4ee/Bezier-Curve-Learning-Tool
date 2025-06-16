@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.IntSize
 import data.MainViewModel.Companion.POINTS_CAP
 import utils.binomialCoefficients
 import java.math.RoundingMode
@@ -29,6 +30,7 @@ class MainViewModel {
         /** Number of curve steps per control point (controls smoothness). */
         const val STEPS_PER_POINT = 15
 
+        /** Default cell size before scaling. */
         const val BASE_CELL_SIZE = 100f
     }
 
@@ -40,8 +42,16 @@ class MainViewModel {
     var panningOffset by mutableStateOf(Offset(0f, 0f))
         private set
 
+    /** Current cell size used for rendering, adjusted by the zoom scale */
     var scaledCellSize by mutableStateOf(BASE_CELL_SIZE * scale)
         private set
+
+    /** Current size of the canvas in pixels */
+    private var canvasSize = mutableStateOf(IntSize.Zero)
+
+    /** Center point of the canvas in pixels */
+    val canvasCenter: Offset
+        get() = Offset(canvasSize.value.width / 2f, canvasSize.value.height / 2f)
 
     /** List of editable control points as entered by the user. */
     val controlPoints = mutableStateListOf<EditablePoint>()
@@ -104,9 +114,15 @@ class MainViewModel {
         }
     }
 
-    fun addPointAt(position: Offset, cellSize: Float) {
+    /**
+     * Adds a new control point at the specified [position] on the canvas.
+     * The position is interpreted relative to the graph's coordinate system.
+     *
+     * @param position the screen-space position where the point should be added.
+     */
+    fun addPointAt(position: Offset) {
         if (controlPoints.size < POINTS_CAP) {
-            val point = position / cellSize
+            val point = (position - (canvasCenter + panningOffset)) / scaledCellSize
             val decimalFormat = DecimalFormat("##.##").apply {
                 roundingMode = RoundingMode.DOWN
             }
@@ -175,5 +191,10 @@ class MainViewModel {
      */
     fun updatePanningOffset(delta: Offset) {
         panningOffset += delta
+    }
+
+    /** Updates the internal record of the canvas size. */
+    fun updateCanvasSize(newSize: IntSize) {
+        canvasSize.value = newSize
     }
 }
