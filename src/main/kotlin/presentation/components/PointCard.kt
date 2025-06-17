@@ -35,7 +35,7 @@ fun PointCard(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val isError = point.toOffset() == null
+    val isError = !point.isValid
 
     val headerColor = when {
         isFocused -> AppColors.Primary

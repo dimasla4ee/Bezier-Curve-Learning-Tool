@@ -10,10 +10,9 @@ import domain.MainViewModel.Companion.POINTS_CAP
 import domain.model.EditablePoint
 import presentation.graph.*
 import utils.binomialCoefficients
+import utils.recalculate
 import utils.toEditablePoint
 import utils.toScale
-import java.math.RoundingMode
-import java.text.DecimalFormat
 import kotlin.math.pow
 
 class MainViewModel {
@@ -47,10 +46,6 @@ class MainViewModel {
 
     /** List of editable control points as entered by the user. */
     val controlPoints = mutableStateListOf<EditablePoint>()
-
-    private val decimalFormat = DecimalFormat("##.##").apply {
-        roundingMode = RoundingMode.DOWN
-    }
 
     /**
      * Generates a list of points along the Bézier curve based on current control points.
@@ -118,7 +113,7 @@ class MainViewModel {
         if (controlPoints.size >= POINTS_CAP) return
 
         val point = (position - canvasCenter - panningOffset) / scaledCellSize
-        controlPoints.add(point.toEditablePoint(decimalFormat))
+        controlPoints.add(point.toEditablePoint())
     }
 
     /** Removes a control point at the specified [index]. */
@@ -150,8 +145,10 @@ class MainViewModel {
      * @param newValue new X value in string format.
      */
     fun updateX(index: Int, newValue: String) {
-        if (matchesDecimalPattern(newValue))
-            controlPoints[index] = controlPoints[index].copy(xInput = newValue)
+        if (matchesDecimalPattern(newValue)) {
+            val old = controlPoints[index]
+            controlPoints[index] = old.copy(xInput = newValue).recalculate()
+        }
     }
 
     /**
@@ -161,8 +158,10 @@ class MainViewModel {
      * @param newValue new Y value in string format.
      */
     fun updateY(index: Int, newValue: String) {
-        if (matchesDecimalPattern(newValue))
-            controlPoints[index] = controlPoints[index].copy(yInput = newValue)
+        if (matchesDecimalPattern(newValue)) {
+            val old = controlPoints[index]
+            controlPoints[index] = old.copy(yInput = newValue).recalculate()
+        }
     }
 
     /** Validates [str] to match a decimal pattern (supports comma as decimal separator). */
@@ -171,7 +170,7 @@ class MainViewModel {
     /** Converts the list of editable control points to a list of [Offset] without nulls. */
     fun getControlPointOffsets(): List<Offset> =
         controlPoints.mapNotNull { point ->
-            point.toOffset()?.toScale(panningOffset + canvasCenter, scaledCellSize)
+            point.offset?.toScale(panningOffset + canvasCenter, scaledCellSize)
         }
 
     /** Returns the list of [Offset] for calculated Bézier curve points. */

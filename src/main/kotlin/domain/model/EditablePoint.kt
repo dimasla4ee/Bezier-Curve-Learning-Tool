@@ -3,24 +3,16 @@ package domain.model
 import androidx.compose.ui.geometry.Offset
 
 /**
- * Represents a control point in editable string form.
+ * Represents a control point as user-editable string inputs.
  *
- * The [xInput] and [yInput] values are stored as strings to allow partial or invalid input during editing.
+ * @property xInput the X coordinate as entered by the user (in string form, using comma as decimal separator).
+ * @property yInput the Y coordinate as entered by the user (in string form, using comma as decimal separator).
+ * @property offset the parsed [Offset] value if the input is valid, or `null` otherwise.
+ * @property isValid indicates whether both [xInput] and [yInput] can be successfully parsed into a valid coordinate.
  */
 data class EditablePoint(
     var xInput: String,
-    var yInput: String
-) {
-    /**
-     * Attempts to convert this editable point into a [androidx.compose.ui.geometry.Offset].
-     *
-     * This method supports both dot (`.`) and comma (`,`) as decimal separators.
-     *
-     * @return an [androidx.compose.ui.geometry.Offset] if both [xInput] and [yInput] are valid float representations, or `null` otherwise.
-     */
-    fun toOffset(): Offset? {
-        val xParsed = xInput.replace(',', '.').toFloatOrNull() ?: return null
-        val yParsed = yInput.replace(',', '.').toFloatOrNull() ?: return null
-        return Offset(xParsed, yParsed)
-    }
-}
+    var yInput: String,
+    val offset: Offset? = null,
+    val isValid: Boolean = false
+)
