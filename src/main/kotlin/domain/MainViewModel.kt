@@ -1,4 +1,4 @@
-package data
+package domain
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -6,7 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
-import data.MainViewModel.Companion.POINTS_CAP
+import domain.MainViewModel.Companion.POINTS_CAP
+import domain.model.EditablePoint
 import utils.binomialCoefficients
 import utils.toEditablePoint
 import utils.toScale
@@ -38,8 +39,7 @@ class MainViewModel {
         const val POINT_RADIUS = 4f
     }
 
-    val pointRadius: Float
-        get() = POINT_RADIUS
+    val pointRadius: Float = POINT_RADIUS
 
     /** Current zoom level applied to the graph view. */
     var scale by mutableStateOf(0.5f)
@@ -54,7 +54,7 @@ class MainViewModel {
         private set
 
     /** Current size of the canvas in pixels */
-    private var canvasSize = mutableStateOf(IntSize.Zero)
+    private var canvasSize = mutableStateOf(IntSize.Companion.Zero)
 
     /** Center point of the canvas in pixels */
     val canvasCenter: Offset
@@ -104,7 +104,7 @@ class MainViewModel {
      * @return the point on the curve at position [t].
      */
     fun findBezierPoint(t: Float, points: List<Offset>): Offset {
-        var point = Offset.Zero
+        var point = Offset.Companion.Zero
         val n = points.lastIndex
 
         for (i in 0..n) {

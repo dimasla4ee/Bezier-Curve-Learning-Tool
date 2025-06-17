@@ -1,7 +1,7 @@
 package utils
 
 import androidx.compose.ui.geometry.Offset
-import data.EditablePoint
+import domain.model.EditablePoint
 import java.text.DecimalFormat
 
 /**

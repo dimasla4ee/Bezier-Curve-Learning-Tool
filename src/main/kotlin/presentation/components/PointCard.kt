@@ -1,4 +1,4 @@
-package ui
+package presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,7 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import data.EditablePoint
+import domain.model.EditablePoint
 import resources.AppColors
 import resources.AppDimensions
 

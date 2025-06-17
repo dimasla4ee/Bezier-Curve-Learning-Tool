@@ -1,3 +1,5 @@
+package app
+
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -15,14 +17,14 @@ import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
-import data.MainViewModel
+import domain.MainViewModel
 import kotlinx.coroutines.launch
+import presentation.components.DismissibleDrawerCard
+import presentation.components.IconButton
+import presentation.components.PointCard
+import presentation.graph.BezierCurveGraph
 import resources.AppColors
 import resources.AppDimensions
-import ui.BezierCurveGraph
-import ui.DismissibleDrawerCard
-import ui.IconButton
-import ui.PointCard
 import java.awt.Dimension
 
 fun main() = singleWindowApplication(

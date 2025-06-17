@@ -1,4 +1,4 @@
-package data
+package domain.model
 
 import androidx.compose.ui.geometry.Offset
 
@@ -12,11 +12,11 @@ data class EditablePoint(
     var yInput: String
 ) {
     /**
-     * Attempts to convert this editable point into a [Offset].
+     * Attempts to convert this editable point into a [androidx.compose.ui.geometry.Offset].
      *
      * This method supports both dot (`.`) and comma (`,`) as decimal separators.
      *
-     * @return an [Offset] if both [xInput] and [yInput] are valid float representations, or `null` otherwise.
+     * @return an [androidx.compose.ui.geometry.Offset] if both [xInput] and [yInput] are valid float representations, or `null` otherwise.
      */
     fun toOffset(): Offset? {
         val xParsed = xInput.replace(',', '.').toFloatOrNull() ?: return null
@@ -24,4 +24,3 @@ data class EditablePoint(
         return Offset(xParsed, yParsed)
     }
 }
-

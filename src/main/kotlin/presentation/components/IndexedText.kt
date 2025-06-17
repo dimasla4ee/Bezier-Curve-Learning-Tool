@@ -1,4 +1,4 @@
-package ui
+package presentation.components
 
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material.LocalTextStyle
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.TextUnit
  * where the index is styled with a separate font size.
  *
  * All the standard [Text] parameters are supported and forwarded.
- * Refer to [androidx.compose.material.Text] documentation for full parameter details.
+ * Refer to [Text] documentation for full parameter details.
  *
  * @param text the main text to display.
  * @param index the index number to append after the text.
