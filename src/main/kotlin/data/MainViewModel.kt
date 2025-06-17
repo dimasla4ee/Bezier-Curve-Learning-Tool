@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import data.MainViewModel.Companion.POINTS_CAP
 import utils.binomialCoefficients
+import utils.toScale
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.math.pow
@@ -63,23 +64,21 @@ class MainViewModel {
     private val graphPoints: MutableList<Offset>
         get() {
             val parsedControlPoints = getControlPointOffsets()
-            if (parsedControlPoints.contains(null)) {
+            val containsInvalidPoints = parsedControlPoints.size != controlPoints.size
+            val notEnoughPoints = parsedControlPoints.size < 2
+
+            if (containsInvalidPoints || notEnoughPoints) {
                 return mutableListOf()
             }
 
-            val points = parsedControlPoints.filterNotNull()
-            if (points.size < 2) {
-                return mutableListOf()
-            }
-
-            val n = points.lastIndex
+            val n = parsedControlPoints.lastIndex
             val steps = (STEPS_PER_POINT * n).coerceAtLeast(2)
 
             val result = mutableStateListOf<Offset>()
 
             for (tStep in 0..steps) {
                 val t = tStep / steps.toFloat()
-                val point = findBezierPoint(t, points)
+                val point = findBezierPoint(t, parsedControlPoints)
 
                 result.add(point)
             }
@@ -167,10 +166,13 @@ class MainViewModel {
     /** Validates [str] to match a decimal pattern (supports comma as decimal separator). */
     private fun matchesDecimalPattern(str: String): Boolean = Regex("^-?\\d{0,2}(,\\d{0,2})?$").matches(str)
 
-    /** Converts the list of editable control points to a list of [Offset], replacing invalid entries with null. */
-    fun getControlPointOffsets(): List<Offset?> = controlPoints.map { it.toOffset() }
+    /** Converts the list of editable control points to a list of [Offset] without nulls. */
+    fun getControlPointOffsets(): List<Offset> =
+        controlPoints.mapNotNull { point ->
+            point.toOffset()?.toScale(panningOffset + canvasCenter, scaledCellSize)
+        }
 
-    /** Returns the list of Bézier curve points. */
+    /** Returns the list of [Offset] for calculated Bézier curve points. */
     fun getGraphPointOffsets(): List<Offset> = graphPoints
 
     /**

@@ -126,9 +126,9 @@ fun App() {
                             }
                         },
                     gridColor = AppColors.Divider,
-                    controlPoints = viewModel.getControlPointOffsets(),
                     cellSize = viewModel.scaledCellSize,
                     panOffset = viewModel.panningOffset,
+                    controlPoints = viewModel.getControlPointOffsets(),
                     graphPoints = viewModel.getGraphPointOffsets()
                 )
 

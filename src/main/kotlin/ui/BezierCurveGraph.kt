@@ -1,23 +1,19 @@
 package ui
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import utils.toScale
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BezierCurveGraph(
     modifier: Modifier = Modifier,
-    controlPoints: List<Offset?>,           // Initial control points
-    graphPoints: List<Offset>,              // Calculated Bezier curve points
+    controlPoints: List<Offset>,    // Points to be drawn
+    graphPoints: List<Offset>,      // Key points used to draw a graph
     cellSize: Float,
     panOffset: Offset,
     gridColor: Color = Color.Gray,
@@ -35,16 +31,15 @@ fun BezierCurveGraph(
             axisStyle = axisStyle
         )
 
-        if (!controlPoints.contains(null)) {
-            drawCurve(graphPoints.map { it.toScale(center + panOffset, cellSize) })
-        }
+        drawCurve(graphPoints)
 
-        drawPoints(
-            points = controlPoints.filterNotNull().map { it.toScale(center + panOffset, cellSize) },
-            pointMode = PointMode.Points,
-            strokeWidth = 6f,
-            color = Color.Red
-        )
+        controlPoints.forEach { pos ->
+            drawCircle(
+                color = Color.Red,
+                radius = 4f,
+                center = pos
+            )
+        }
     }
 }
 
