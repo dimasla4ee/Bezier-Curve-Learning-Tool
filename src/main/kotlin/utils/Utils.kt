@@ -40,6 +40,17 @@ fun Offset.toScale(screenCenterWithPan: Offset, cellSize: Float): Offset =
         screenCenterWithPan.y + y * -cellSize
     )
 
+/**
+ * Converts a screen-space [Offset] to an [EditablePoint] suitable for UI input fields.
+ *
+ * This function formats the X and Y values using the provided [decimalFormat], and applies
+ * a sign inversion to the Y-axis to match the mathematical coordinate system used in the graph.
+ * Additionally, it replaces the decimal point (`.`) with a comma (`,`) for localization.
+ *
+ * @receiver the [Offset] representing a point in logical or graph space.
+ * @param decimalFormat the formatter used to round and convert numeric values to strings.
+ * @return an [EditablePoint] with X and Y coordinates as formatted strings.
+ */
 fun Offset.toEditablePoint(decimalFormat: DecimalFormat): EditablePoint =
     EditablePoint(
         decimalFormat.format(x).replace('.', ','),

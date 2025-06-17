@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import domain.MainViewModel.Companion.POINTS_CAP
 import domain.model.EditablePoint
+import presentation.graph.*
 import utils.binomialCoefficients
 import utils.toEditablePoint
 import utils.toScale
@@ -18,28 +19,12 @@ import kotlin.math.pow
 class MainViewModel {
 
     companion object {
-        /** Maximum allowed zoom level. */
-        const val MAX_SCALE = 2f
-
-        /** Minimum allowed zoom level. */
-        const val MIN_SCALE = 0.2f
-
-        /** Zoom sensitivity multiplier. */
-        const val SCALE_MULTIPLIER = 0.05f
-
         /** Maximum number of control points. */
         const val POINTS_CAP = 4
 
         /** Number of curve steps per control point (controls smoothness). */
         const val STEPS_PER_POINT = 15
-
-        /** Default cell size before scaling. */
-        const val BASE_CELL_SIZE = 100f
-
-        const val POINT_RADIUS = 4f
     }
-
-    val pointRadius: Float = POINT_RADIUS
 
     /** Current zoom level applied to the graph view. */
     var scale by mutableStateOf(0.5f)
@@ -141,6 +126,12 @@ class MainViewModel {
         controlPoints.removeAt(index)
     }
 
+
+    /**
+     * Removes a control point located near the given [position], if within hit radius.
+     *
+     * @param position the screen-space position to check for a nearby point.
+     */
     fun removePointAt(position: Offset) {
         val parsedControlPoints = getControlPointOffsets()
         parsedControlPoints.forEachIndexed { index, offset ->

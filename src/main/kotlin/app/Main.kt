@@ -23,6 +23,7 @@ import presentation.components.DismissibleDrawerCard
 import presentation.components.IconButton
 import presentation.components.PointCard
 import presentation.graph.BezierCurveGraph
+import presentation.graph.POINT_RADIUS
 import resources.AppColors
 import resources.AppDimensions
 import java.awt.Dimension
@@ -130,7 +131,7 @@ fun App() {
                     cellSize = viewModel.scaledCellSize,
                     panOffset = viewModel.panningOffset,
                     controlPoints = viewModel.getControlPointOffsets(),
-                    pointRadius = viewModel.pointRadius,
+                    pointRadius = POINT_RADIUS,
                     graphPoints = viewModel.getGraphPointOffsets()
                 )
 
