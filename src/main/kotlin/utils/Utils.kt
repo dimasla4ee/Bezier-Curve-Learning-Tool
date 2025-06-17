@@ -1,6 +1,8 @@
 package utils
 
 import androidx.compose.ui.geometry.Offset
+import data.EditablePoint
+import java.text.DecimalFormat
 
 /**
  * Calculates binomial coefficient "n choose r" which represents the number of ways
@@ -33,4 +35,13 @@ fun factorial(n: Int): Int {
  * @return a new [Offset] representing the point in screen coordinates.
  */
 fun Offset.toScale(screenCenterWithPan: Offset, cellSize: Float): Offset =
-    Offset(screenCenterWithPan.x + x * cellSize, screenCenterWithPan.y + y * -cellSize)
+    Offset(
+        screenCenterWithPan.x + x * cellSize,
+        screenCenterWithPan.y + y * -cellSize
+    )
+
+fun Offset.toEditablePoint(decimalFormat: DecimalFormat): EditablePoint =
+    EditablePoint(
+        decimalFormat.format(x).replace('.', ','),
+        decimalFormat.format(-y).replace('.', ',')
+    )

@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 fun BezierCurveGraph(
     modifier: Modifier = Modifier,
     controlPoints: List<Offset>,    // Points to be drawn
+    pointRadius: Float,
     graphPoints: List<Offset>,      // Key points used to draw a graph
     cellSize: Float,
     panOffset: Offset,
@@ -36,7 +37,7 @@ fun BezierCurveGraph(
         controlPoints.forEach { pos ->
             drawCircle(
                 color = Color.Red,
-                radius = 4f,
+                radius = pointRadius,
                 center = pos
             )
         }
@@ -82,13 +83,13 @@ fun DrawScope.drawGrid(
     // Draw axis
     if (axisStyle != AxisStyle.NoAxis) {
         drawLine(
-            color = Color.Black,
+            color = Color.Black.copy(alpha = 0.4f),
             start = Offset(0f, center.y + panOffset.y),
             end = Offset(size.width, center.y + panOffset.y),
             strokeWidth = strokeWidth
         )
         drawLine(
-            color = Color.Black,
+            color = Color.Black.copy(alpha = 0.4f),
             start = Offset(center.x + panOffset.x, 0f),
             end = Offset(center.x + panOffset.x, size.height),
             strokeWidth = strokeWidth

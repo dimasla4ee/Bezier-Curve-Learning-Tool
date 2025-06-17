@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import data.MainViewModel.Companion.POINTS_CAP
 import utils.binomialCoefficients
+import utils.toEditablePoint
 import utils.toScale
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -33,7 +34,12 @@ class MainViewModel {
 
         /** Default cell size before scaling. */
         const val BASE_CELL_SIZE = 100f
+
+        const val POINT_RADIUS = 4f
     }
+
+    val pointRadius: Float
+        get() = POINT_RADIUS
 
     /** Current zoom level applied to the graph view. */
     var scale by mutableStateOf(0.5f)
@@ -56,6 +62,10 @@ class MainViewModel {
 
     /** List of editable control points as entered by the user. */
     val controlPoints = mutableStateListOf<EditablePoint>()
+
+    private val decimalFormat = DecimalFormat("##.##").apply {
+        roundingMode = RoundingMode.DOWN
+    }
 
     /**
      * Generates a list of points along the Bézier curve based on current control points.
@@ -120,23 +130,26 @@ class MainViewModel {
      * @param position the screen-space position where the point should be added.
      */
     fun addPointAt(position: Offset) {
-        if (controlPoints.size < POINTS_CAP) {
-            val point = (position - (canvasCenter + panningOffset)) / scaledCellSize
-            val decimalFormat = DecimalFormat("##.##").apply {
-                roundingMode = RoundingMode.DOWN
-            }
-            controlPoints.add(
-                EditablePoint(
-                    decimalFormat.format(point.x).toString().replace('.', ','),
-                    decimalFormat.format(-point.y).toString().replace('.', ',')
-                )
-            )
-        }
+        if (controlPoints.size >= POINTS_CAP) return
+
+        val point = (position - canvasCenter - panningOffset) / scaledCellSize
+        controlPoints.add(point.toEditablePoint(decimalFormat))
     }
 
     /** Removes a control point at the specified [index]. */
     fun removePoint(index: Int) {
         controlPoints.removeAt(index)
+    }
+
+    fun removePointAt(position: Offset) {
+        val parsedControlPoints = getControlPointOffsets()
+        parsedControlPoints.forEachIndexed { index, offset ->
+            val distance = (position - offset).getDistance()
+            if (distance <= POINT_RADIUS + 1f) {
+                removePoint(index)
+                return
+            }
+        }
     }
 
     /**
@@ -146,9 +159,8 @@ class MainViewModel {
      * @param newValue new X value in string format.
      */
     fun updateX(index: Int, newValue: String) {
-        if (matchesDecimalPattern(newValue)) {
+        if (matchesDecimalPattern(newValue))
             controlPoints[index] = controlPoints[index].copy(xInput = newValue)
-        }
     }
 
     /**
@@ -158,9 +170,8 @@ class MainViewModel {
      * @param newValue new Y value in string format.
      */
     fun updateY(index: Int, newValue: String) {
-        if (matchesDecimalPattern(newValue)) {
+        if (matchesDecimalPattern(newValue))
             controlPoints[index] = controlPoints[index].copy(yInput = newValue)
-        }
     }
 
     /** Validates [str] to match a decimal pattern (supports comma as decimal separator). */

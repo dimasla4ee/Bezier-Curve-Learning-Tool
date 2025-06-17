@@ -11,10 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.isPrimaryPressed
-import androidx.compose.ui.input.pointer.isTertiaryPressed
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
@@ -107,6 +104,8 @@ fun App() {
                                         PointerEventType.Press -> {
                                             if (event.buttons.isPrimaryPressed) {
                                                 viewModel.addPointAt(change.position)
+                                            } else if (event.buttons.isSecondaryPressed) {
+                                                viewModel.removePointAt(change.position)
                                             }
                                         }
 
@@ -129,6 +128,7 @@ fun App() {
                     cellSize = viewModel.scaledCellSize,
                     panOffset = viewModel.panningOffset,
                     controlPoints = viewModel.getControlPointOffsets(),
+                    pointRadius = viewModel.pointRadius,
                     graphPoints = viewModel.getGraphPointOffsets()
                 )
 
