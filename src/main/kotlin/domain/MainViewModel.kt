@@ -1,9 +1,6 @@
 package domain
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import domain.MainViewModel.Companion.POINTS_CAP
@@ -31,6 +28,9 @@ class MainViewModel {
 
     /** Current pan offset applied to the graph view. */
     var panningOffset by mutableStateOf(Offset(0f, 0f))
+        private set
+
+    var interpolation by mutableFloatStateOf(0f)
         private set
 
     /** Current cell size used for rendering, adjusted by the zoom scale */
@@ -156,7 +156,7 @@ class MainViewModel {
      * @param position the new position of the point in screen-space coordinates.
      */
     fun movePoint(index: Int?, position: Offset) {
-        if (index == null || index !in controlPoints.indices ) return
+        if (index == null || index !in controlPoints.indices) return
 
         val coordinates = (position - canvasCenter - panningOffset) / scaledCellSize
         controlPoints[index] = coordinates.toEditablePoint()
@@ -223,5 +223,9 @@ class MainViewModel {
     /** Updates the internal record of the canvas size. */
     fun updateCanvasSize(newSize: IntSize) {
         canvasSize.value = newSize
+    }
+
+    fun updateInterpolation(newValue: Float) {
+        interpolation = newValue
     }
 }

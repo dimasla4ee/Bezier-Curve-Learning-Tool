@@ -18,10 +18,11 @@ fun IconButton(
     modifier: Modifier = Modifier,
     imageVector: ImageVector,
     tint: Color = AppColors.OnSurfaceVariant,
-    contentDescription: String,
+    tooltipText: String,
+    contentDescription: String? = tooltipText,
     onClick: () -> Unit
 ) {
-    Tooltip(contentDescription) {
+    Tooltip(tooltipText) {
         Icon(
             modifier = modifier
                 .size(AppDimensions.IconButtonSize)

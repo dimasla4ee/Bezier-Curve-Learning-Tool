@@ -34,6 +34,19 @@ fun BezierCurveGraph(
 
         drawCurve(graphPoints)
 
+        if (controlPoints.size > 2) {
+            drawLine(
+                color = Color.Blue.copy(alpha = 0.4f),
+                start = controlPoints.first(),
+                end = controlPoints[1]
+            )
+            drawLine(
+                color = Color.Blue.copy(alpha = 0.4f),
+                start = controlPoints.last(),
+                end = controlPoints[controlPoints.lastIndex - 1]
+            )
+        }
+
         controlPoints.forEach { pos ->
             drawCircle(
                 color = Color.Red,
@@ -104,7 +117,8 @@ fun DrawScope.drawCurve(
         drawLine(
             color = Color.Blue,
             start = curvePoints[i],
-            end = curvePoints[i + 1]
+            end = curvePoints[i + 1],
+            strokeWidth = 2f
         )
     }
 }

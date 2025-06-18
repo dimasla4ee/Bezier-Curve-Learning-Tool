@@ -4,24 +4,23 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.DrawerState
-import androidx.compose.material.DrawerValue
-import androidx.compose.material.Surface
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.singleWindowApplication
 import domain.MainViewModel
 import kotlinx.coroutines.launch
-import presentation.components.DismissibleDrawerCard
-import presentation.components.IconButton
-import presentation.components.PointCard
+import presentation.components.*
 import presentation.graph.BezierCurveGraph
 import presentation.graph.POINT_RADIUS
 import resources.AppColors
@@ -63,18 +62,68 @@ fun App() {
                 ) {
                     IconButton(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Добавить точку",
+                        tooltipText = "Добавить точку",
                         onClick = { viewModel.addPoint() }
                     )
 
                     IconButton(
                         imageVector = Icons.AutoMirrored.Filled.MenuOpen,
-                        contentDescription = "Свернуть меню",
+                        tooltipText = "Свернуть меню",
                         onClick = { coroutineScope.launch { drawerState.close() } }
                     )
                 }
 
                 Divider(Modifier.fillMaxWidth(), thickness = 1.5.dp, color = AppColors.Divider)
+
+                var showFormula by remember { mutableStateOf(true) }
+                var showSupportLines by remember { mutableStateOf(true) }
+
+                Card(
+                    modifier = Modifier
+                        .width(249.dp)
+                        .height(100.dp),
+                    headerColor = AppColors.SurfaceVariant,
+                    headerContent = {
+                        Icon(
+                            modifier = Modifier.size(16.dp),
+                            imageVector = Icons.Outlined.Settings,
+                            tint = AppColors.OnSurfaceVariant,
+                            contentDescription = "Settings"
+                        )
+                    },
+                    content = {
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    modifier = Modifier.scale(0.5f),
+                                    checked = showFormula,
+                                    onCheckedChange = { showFormula = !showFormula },
+                                )
+                                Text("Показать формулу", fontSize = 8.sp)
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    modifier = Modifier.scale(0.5f),
+                                    checked = showSupportLines,
+                                    onCheckedChange = { showSupportLines = !showSupportLines },
+                                )
+                                Text("Показать вспомогательные линии", fontSize = 8.sp)
+                            }
+                        }
+                    }
+                )
+
+                Divider(Modifier.fillMaxWidth(), thickness = 1.5.dp, color = AppColors.Divider)
+
+                InterpolationCard(
+                    modifier = Modifier
+                        .width(249.dp)
+                        .height(50.dp),
+                    value = viewModel.interpolation,
+                    onValueChange = { viewModel.updateInterpolation(it) }
+                )
+
+                Divider(Modifier.fillMaxWidth(), color = AppColors.Divider)
 
                 viewModel.controlPoints.forEachIndexed { index, point ->
                     PointCard(
@@ -155,7 +204,7 @@ fun App() {
                             top = AppDimensions.MediumPadding
                         ),
                         imageVector = Icons.AutoMirrored.Filled.MenuOpen,
-                        contentDescription = "Раскрыть меню",
+                        tooltipText = "Раскрыть меню",
                         onClick = { coroutineScope.launch { drawerState.open() } }
                     )
                 }
