@@ -43,6 +43,8 @@ fun App() {
     val drawerState = DrawerState(DrawerValue.Open)
     val coroutineScope = rememberCoroutineScope()
     var isDraggingGraph by remember { mutableStateOf(false) }
+    var isDraggingPoint by remember { mutableStateOf(false) }
+    var draggedPointIndex: Int? by remember { mutableStateOf(null) }
 
     Surface(Modifier.fillMaxSize(), color = AppColors.Base) {
         DismissibleDrawerCard(
@@ -101,21 +103,32 @@ fun App() {
                                 while (true) {
                                     val event = awaitPointerEvent()
                                     val change = event.changes.first()
+                                    val mousePosition = change.position
+
                                     isDraggingGraph = event.buttons.isTertiaryPressed
+                                    isDraggingPoint = event.buttons.isPrimaryPressed
 
                                     when (event.type) {
                                         PointerEventType.Press -> {
                                             if (event.buttons.isPrimaryPressed) {
-                                                viewModel.addPointAt(change.position)
+                                                draggedPointIndex = viewModel.pointPressed(
+                                                    mousePosition,
+                                                    POINT_RADIUS + 8f
+                                                )
+                                                if (draggedPointIndex == null) {
+                                                    viewModel.addPointAt(mousePosition)
+                                                }
                                             } else if (event.buttons.isSecondaryPressed) {
-                                                viewModel.removePointAt(change.position)
+                                                viewModel.removePointAt(mousePosition)
                                             }
                                         }
 
                                         PointerEventType.Move -> {
                                             if (isDraggingGraph) {
-                                                val delta = change.position - change.previousPosition
+                                                val delta = mousePosition - change.previousPosition
                                                 viewModel.updatePanningOffset(delta)
+                                            } else if (isDraggingPoint) {
+                                                viewModel.movePoint(draggedPointIndex, mousePosition)
                                             }
                                         }
 

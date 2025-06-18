@@ -121,21 +121,45 @@ class MainViewModel {
         controlPoints.removeAt(index)
     }
 
-
     /**
      * Removes a control point located near the given [position], if within hit radius.
      *
      * @param position the screen-space position to check for a nearby point.
      */
     fun removePointAt(position: Offset) {
+        val pointIndex = pointPressed(position, POINT_RADIUS + 1f) ?: return
+        removePoint(pointIndex)
+    }
+
+    /**
+     * Determines if a control point is pressed within a specified radius.
+     *
+     * @param position the screen-space position to check for a nearby point.
+     * @param radius the radius within which a point is considered pressed.
+     * @return the index of the pressed point, or null if no point is within the radius.
+     */
+    fun pointPressed(position: Offset, radius: Float): Int? {
         val parsedControlPoints = getControlPointOffsets()
         parsedControlPoints.forEachIndexed { index, offset ->
             val distance = (position - offset).getDistance()
-            if (distance <= POINT_RADIUS + 1f) {
-                removePoint(index)
-                return
-            }
+            if (distance <= radius) return index
         }
+        return null
+    }
+
+    /**
+     * Moves a control point to a new position.
+     *
+     * Does nothing if index is invalid.
+     *
+     * @param index the index of the point to move.
+     * @param position the new position of the point in screen-space coordinates.
+     */
+    fun movePoint(index: Int?, position: Offset) {
+        if (index == null || index !in controlPoints.indices ) return
+
+        val coordinates = (position - canvasCenter - panningOffset) / scaledCellSize
+        controlPoints[index] = coordinates.toEditablePoint()
     }
 
     /**
