@@ -10,28 +10,30 @@ import presentation.graph.MAX_SCALE
 import presentation.graph.MIN_SCALE
 import presentation.graph.SCALE_MULTIPLIER
 
+/** ViewModel for managing the graph view, including zooming and panning functionality. */
 class GraphViewModel {
 
     /** Current zoom level applied to the graph view. */
     var scale by mutableStateOf(0.5f)
         private set
 
+    /** Current cell size used for rendering, adjusted by the zoom scale. */
+    var scaledCellSize by mutableStateOf(BASE_CELL_SIZE * scale)
+        private set
+
+
     /** Current pan offset applied to the graph view. */
     var panningOffset by mutableStateOf(Offset(0f, 0f))
         private set
 
-
-    /** Current cell size used for rendering, adjusted by the zoom scale */
-    var scaledCellSize by mutableStateOf(BASE_CELL_SIZE * scale)
-        private set
-
-    /** Current size of the graph canvas in pixels */
+    /** Current size of the graph canvas in pixels. */
     private var canvasSize = mutableStateOf(IntSize.Companion.Zero)
 
     /** Center point of the canvas in pixels */
-    val canvasCenter: Offset
+    private val canvasCenter: Offset
         get() = Offset(canvasSize.value.width / 2f, canvasSize.value.height / 2f)
 
+    /** The origin point of the graph, calculated as the canvas center offset by panning offset */
     val origin: Offset
         get() = canvasCenter + panningOffset
 
@@ -42,6 +44,7 @@ class GraphViewModel {
      */
     fun updateScale(delta: Float) {
         val newValue = scale - delta * SCALE_MULTIPLIER
+
         scale = newValue.coerceIn(MIN_SCALE..MAX_SCALE)
         scaledCellSize = BASE_CELL_SIZE * scale
     }

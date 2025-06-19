@@ -13,9 +13,7 @@ import domain.model.EditablePoint
  */
 fun binomialCoefficients(n: Int, r: Int): Int = factorial(n) / (factorial(r) * factorial(n - r))
 
-/**
- * Returns the factorial of a given non-negative integer `n` (i.e., n!).
- */
+/** Returns the factorial of a given non-negative integer `n` (i.e., n!). */
 fun factorial(n: Int): Int {
     require(n >= 0)
     var factorial = 1
@@ -69,11 +67,36 @@ fun EditablePoint.recalculate(): EditablePoint {
     }
 }
 
+/**
+ * Converts a screen-space coordinate to model-space (logical graph coordinate).
+ *
+ * This function takes into account the origin of the logical coordinate system (e.g., canvas center + pan offset)
+ * and the scale of the grid (cell size), and also inverts the Y-axis to match mathematical convention.
+ *
+ * @param screenPoint the coordinate in screen space (e.g., raw mouse position).
+ * @param origin the logical center point of the graph in screen coordinates (typically canvas center + pan offset).
+ * @param cellSize the size of a single logical unit in pixels.
+ * @return the corresponding position in model (graph) space.
+ * @see modelToScreen
+ */
 fun screenToModel(screenPoint: Offset, origin: Offset, cellSize: Float): Offset {
     val temp = (screenPoint - origin) / cellSize
     return Offset(temp.x, -temp.y)
 }
 
+/**
+ * Converts a model-space coordinate (graph coordinate) to screen-space.
+ *
+ * This is the inverse of [screenToModel]. It maps logical coordinates (e.g., control points)
+ * to pixel coordinates for drawing on the screen. It also inverts the Y-axis to match
+ * screen-space convention (top-left origin).
+ *
+ * @param modelPosition the coordinate in logical graph/model space.
+ * @param origin the logical center point of the graph in screen coordinates (typically canvas center + pan offset).
+ * @param cellSize the size of a single logical unit in pixels.
+ * @return the corresponding position in screen (pixel) space.
+ * @see screenToModel
+ */
 fun modelToScreen(modelPosition: Offset, origin: Offset, cellSize: Float): Offset = Offset(
     origin.x + modelPosition.x * cellSize,
     origin.y - modelPosition.y * cellSize

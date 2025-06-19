@@ -19,7 +19,7 @@ import resources.AppColors
 @Composable
 fun PreferencesSidebarCard(
     modifier: Modifier = Modifier,
-    showFormula: Boolean,
+    showEquation: Boolean,
     showSupportLine: Boolean,
     onShowFormulaChange: (Boolean) -> Unit,
     onShowSupportLineChange: (Boolean) -> Unit
@@ -42,7 +42,7 @@ fun PreferencesSidebarCard(
                         modifier = Modifier
                             .scale(0.5f)
                             .size(16.dp),
-                        checked = showFormula,
+                        checked = showEquation,
                         onCheckedChange = { onShowFormulaChange(it) },
                     )
                     Text("Показать формулу", fontSize = 11.sp)

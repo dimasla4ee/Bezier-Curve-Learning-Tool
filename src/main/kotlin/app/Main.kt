@@ -84,9 +84,9 @@ fun App() {
                     modifier = Modifier
                         .width(249.dp)
                         .height(50.dp),
-                    showFormula = viewModel.settings.showFormula,
+                    showEquation = viewModel.settings.showEquation,
                     showSupportLine = viewModel.settings.showSupportLine,
-                    onShowFormulaChange = { viewModel.settings.updateShowFormula(it) },
+                    onShowFormulaChange = { viewModel.settings.updateShowEquation(it) },
                     onShowSupportLineChange = { viewModel.settings.updateShowSupportLine(it) }
                 )
 
