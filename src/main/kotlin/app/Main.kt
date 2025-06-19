@@ -28,6 +28,8 @@ import presentation.graph.BezierCurveGraph
 import presentation.graph.POINT_RADIUS
 import resources.AppColors
 import resources.AppDimensions
+import utils.modelToScreen
+import utils.screenToModel
 import java.awt.Dimension
 
 fun main() = singleWindowApplication(
@@ -66,7 +68,7 @@ fun App() {
                     IconButton(
                         imageVector = Icons.Default.Add,
                         tooltipText = "Добавить точку",
-                        onClick = { viewModel.addPoint() }
+                        onClick = { viewModel.points.addPoint() }
                     )
 
                     IconButton(
@@ -82,10 +84,10 @@ fun App() {
                     modifier = Modifier
                         .width(249.dp)
                         .height(50.dp),
-                    showFormula = viewModel.showFormula,
-                    showSupportLine = viewModel.showSupportLine,
-                    onShowFormulaChange = { viewModel.updateShowFormula(it) },
-                    onShowSupportLineChange = { viewModel.updateShowSupportLine(it) }
+                    showFormula = viewModel.settings.showFormula,
+                    showSupportLine = viewModel.settings.showSupportLine,
+                    onShowFormulaChange = { viewModel.settings.updateShowFormula(it) },
+                    onShowSupportLineChange = { viewModel.settings.updateShowSupportLine(it) }
                 )
 
                 Divider(Modifier.fillMaxWidth(), thickness = 1.5.dp, color = AppColors.Divider)
@@ -94,22 +96,22 @@ fun App() {
                     modifier = Modifier
                         .width(249.dp)
                         .height(50.dp),
-                    value = viewModel.interpolation,
-                    onValueChange = { viewModel.updateInterpolation(it) }
+                    value = viewModel.points.interpolation,
+                    onValueChange = { viewModel.points.updateInterpolation(it) }
                 )
 
                 Divider(Modifier.fillMaxWidth(), color = AppColors.Divider)
 
-                viewModel.controlPoints.forEachIndexed { index, point ->
+                viewModel.points.controlPoints.forEachIndexed { index, point ->
                     PointSidebarCard(
                         modifier = Modifier
                             .width(249.dp)
                             .height(50.dp),
                         point = point,
                         pointIndex = index,
-                        onXChange = { viewModel.updateX(index, it) },
-                        onYChange = { viewModel.updateY(index, it) },
-                        onClickClose = { viewModel.removePoint(index) }
+                        onXChange = { viewModel.points.updateX(index, it) },
+                        onYChange = { viewModel.points.updateY(index, it) },
+                        onClickClose = { viewModel.points.removePoint(index) }
                     )
                     Divider(Modifier.fillMaxWidth(), color = AppColors.Divider)
                 }
@@ -121,13 +123,17 @@ fun App() {
             ) {
                 BezierCurveGraph(
                     modifier = Modifier
-                        .onSizeChanged { viewModel.updateCanvasSize(it) }
+                        .onSizeChanged { viewModel.graph.updateCanvasSize(it) }
                         .pointerInput(Unit) {
                             awaitPointerEventScope {
                                 while (true) {
                                     val event = awaitPointerEvent()
                                     val change = event.changes.first()
-                                    val mousePosition = change.position
+                                    val logicalPoint = screenToModel(
+                                        change.position,
+                                        viewModel.graph.origin,
+                                        viewModel.graph.scaledCellSize
+                                    )
 
                                     isDraggingGraph = event.buttons.isTertiaryPressed
                                     isDraggingPoint = event.buttons.isPrimaryPressed
@@ -135,41 +141,54 @@ fun App() {
                                     when (event.type) {
                                         PointerEventType.Press -> {
                                             if (event.buttons.isPrimaryPressed) {
-                                                draggedPointIndex = viewModel.pointPressed(
-                                                    mousePosition,
-                                                    POINT_RADIUS + 8f
+                                                draggedPointIndex = viewModel.points.pointPressed(
+                                                    logicalPoint,
+                                                    0.2f
                                                 )
+                                                println(logicalPoint)
                                                 if (draggedPointIndex == null) {
-                                                    viewModel.addPointAt(mousePosition)
+                                                    viewModel.points.addPointAt(logicalPoint)
                                                 }
                                             } else if (event.buttons.isSecondaryPressed) {
-                                                viewModel.removePointAt(mousePosition)
+                                                viewModel.points.removePointAt(logicalPoint)
                                             }
                                         }
 
                                         PointerEventType.Move -> {
                                             if (isDraggingGraph) {
-                                                val delta = mousePosition - change.previousPosition
-                                                viewModel.updatePanningOffset(delta)
+                                                val delta = change.position - change.previousPosition
+                                                viewModel.graph.updatePanningOffset(delta)
                                             } else if (isDraggingPoint) {
-                                                viewModel.movePoint(draggedPointIndex, mousePosition)
+                                                viewModel.points.movePoint(draggedPointIndex, logicalPoint)
                                             }
                                         }
 
                                         PointerEventType.Scroll -> {
                                             val delta = change.scrollDelta.y
-                                            viewModel.updateScale(delta)
+                                            viewModel.graph.updateScale(delta)
                                         }
                                     }
                                 }
                             }
                         },
                     gridColor = AppColors.Divider,
-                    cellSize = viewModel.scaledCellSize,
-                    panOffset = viewModel.panningOffset,
-                    controlPoints = viewModel.getControlPointOffsets(),
+                    cellSize = viewModel.graph.scaledCellSize,
+                    panOffset = viewModel.graph.panningOffset,
+                    controlPoints = viewModel.points.getControlPointOffsets().map { position ->
+                        modelToScreen(
+                            position,
+                            viewModel.graph.origin,
+                            viewModel.graph.scaledCellSize
+                        )
+                    },
                     pointRadius = POINT_RADIUS,
-                    graphPoints = viewModel.getGraphPointOffsets()
+                    graphPoints = viewModel.points.getGraphPointOffsets().map { position ->
+                        modelToScreen(
+                            position,
+                            viewModel.graph.origin,
+                            viewModel.graph.scaledCellSize
+                        )
+                    }
                 )
 
                 if (drawerState.isClosed) {

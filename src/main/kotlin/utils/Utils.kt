@@ -26,20 +26,6 @@ fun factorial(n: Int): Int {
 }
 
 /**
- * Converts a point in graph coordinates to screen coordinates
- * based on the screen center offset with pan and cell size.
- *
- * @param screenCenterWithPan the screen center offset including pan effect.
- * @param cellSize width and height of a cell in pixels.
- * @return a new [Offset] representing the point in screen coordinates.
- */
-fun Offset.toScale(screenCenterWithPan: Offset, cellSize: Float): Offset =
-    Offset(
-        screenCenterWithPan.x + x * cellSize,
-        screenCenterWithPan.y + y * -cellSize
-    )
-
-/**
  * Converts this [Offset] to an [EditablePoint] suitable for UI input.
  *
  * The result uses localized formatting:
@@ -54,8 +40,8 @@ fun Offset.toEditablePoint(): EditablePoint {
 
     return EditablePoint(
         String.format("%.2f", x).replace('.', ','),
-        String.format("%.2f", -y).replace('.', ','),
-        offset = copy(y = -y),
+        String.format("%.2f", y).replace('.', ','),
+        offset = this,
         isValid = true
     )
 }
@@ -82,3 +68,13 @@ fun EditablePoint.recalculate(): EditablePoint {
         copy(offset = null, isValid = false)
     }
 }
+
+fun screenToModel(screenPoint: Offset, origin: Offset, cellSize: Float): Offset {
+    val temp = (screenPoint - origin) / cellSize
+    return Offset(temp.x, -temp.y)
+}
+
+fun modelToScreen(modelPosition: Offset, origin: Offset, cellSize: Float): Offset = Offset(
+    origin.x + modelPosition.x * cellSize,
+    origin.y - modelPosition.y * cellSize
+)
