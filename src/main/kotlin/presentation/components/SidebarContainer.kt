@@ -14,7 +14,7 @@ import resources.AppColors
 import resources.AppDimensions
 
 @Composable
-fun DismissibleDrawerCard(
+fun SidebarContainer(
     drawerContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     drawerState: DrawerState,

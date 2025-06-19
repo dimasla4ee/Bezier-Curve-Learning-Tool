@@ -4,7 +4,6 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.Surface
@@ -22,8 +21,9 @@ import kotlinx.coroutines.launch
 import presentation.cards.InterpolationSidebarCard
 import presentation.cards.PointSidebarCard
 import presentation.cards.PreferencesSidebarCard
-import presentation.components.DismissibleDrawerCard
+import presentation.components.HorizontalDivider
 import presentation.components.IconButton
+import presentation.components.SidebarContainer
 import presentation.graph.BezierCurveGraph
 import presentation.graph.POINT_RADIUS
 import resources.AppColors
@@ -51,7 +51,7 @@ fun App() {
     var draggedPointIndex: Int? by remember { mutableStateOf(null) }
 
     Surface(Modifier.fillMaxSize(), color = AppColors.Base) {
-        DismissibleDrawerCard(
+        SidebarContainer(
             modifier = Modifier.padding(AppDimensions.MediumPadding),
             drawerState = drawerState,
             drawerElevation = 0.dp,
@@ -78,7 +78,7 @@ fun App() {
                     )
                 }
 
-                Divider(Modifier.fillMaxWidth(), thickness = 1.5.dp, color = AppColors.Divider)
+                HorizontalDivider(thickness = 1.5.dp)
 
                 PreferencesSidebarCard(
                     modifier = Modifier
@@ -90,7 +90,7 @@ fun App() {
                     onShowSupportLineChange = { viewModel.settings.updateShowSupportLine(it) }
                 )
 
-                Divider(Modifier.fillMaxWidth(), thickness = 1.5.dp, color = AppColors.Divider)
+                HorizontalDivider()
 
                 InterpolationSidebarCard(
                     modifier = Modifier
@@ -100,7 +100,7 @@ fun App() {
                     onValueChange = { viewModel.points.updateInterpolation(it) }
                 )
 
-                Divider(Modifier.fillMaxWidth(), color = AppColors.Divider)
+                HorizontalDivider()
 
                 viewModel.points.controlPoints.forEachIndexed { index, point ->
                     PointSidebarCard(
@@ -113,7 +113,7 @@ fun App() {
                         onYChange = { viewModel.points.updateY(index, it) },
                         onClickClose = { viewModel.points.removePoint(index) }
                     )
-                    Divider(Modifier.fillMaxWidth(), color = AppColors.Divider)
+                    HorizontalDivider()
                 }
             },
         ) {
@@ -145,7 +145,6 @@ fun App() {
                                                     logicalPoint,
                                                     0.2f
                                                 )
-                                                println(logicalPoint)
                                                 if (draggedPointIndex == null) {
                                                     viewModel.points.addPointAt(logicalPoint)
                                                 }
