@@ -1,11 +1,10 @@
-package presentation.components
+package presentation.cards
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
-import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -13,103 +12,20 @@ import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import domain.model.EditablePoint
+import presentation.components.IconButton
+import presentation.components.IndexedText
+import presentation.components.NumericTextField
+import presentation.components.Tooltip
 import resources.AppColors
 import resources.AppDimensions
 
 @Composable
-fun Card(
-    modifier: Modifier = Modifier,
-    headerColor: Color,
-    headerContent: @Composable () -> Unit,
-    content: @Composable () -> Unit
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            Modifier
-                .background(headerColor)
-                .fillMaxHeight()
-                .padding(horizontal = AppDimensions.SmallPadding)
-                .width(18.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            headerContent()
-        }
-
-        Row(
-            Modifier
-                .background(headerColor.copy(alpha = 0.2f))
-                .padding(horizontal = AppDimensions.SmallPadding)
-                .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            content()
-        }
-    }
-}
-
-@Composable
-fun InterpolationCard(
-    modifier: Modifier = Modifier,
-    value: Float,
-    onValueChange: (Float) -> Unit
-) {
-    Card(
-        modifier = modifier,
-        headerColor = AppColors.SurfaceVariant,
-        headerContent = {
-            Text(
-                text = "t",
-                fontStyle = FontStyle.Italic,
-                fontFamily = FontFamily.Serif,
-                fontSize = AppDimensions.RegularText
-            )
-        },
-        content = {
-            Text(
-                text = "0",
-                fontStyle = FontStyle.Italic,
-                fontFamily = FontFamily.Serif,
-                fontSize = AppDimensions.SmallText
-            )
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = String.format("%.2f", value),
-                    fontStyle = FontStyle.Italic,
-                    fontFamily = FontFamily.Serif,
-                    fontSize = AppDimensions.RegularText
-                )
-                Slider(
-                    value = value,
-                    onValueChange = { onValueChange(it) },
-                )
-            }
-
-            Text(
-                text = "1",
-                fontStyle = FontStyle.Italic,
-                fontFamily = FontFamily.Serif,
-                fontSize = AppDimensions.SmallText
-            )
-        }
-    )
-}
-
-
-@Composable
-fun PointCard(
+fun PointSidebarCard(
     modifier: Modifier = Modifier,
     pointIndex: Int,
     point: EditablePoint,
@@ -121,17 +37,17 @@ fun PointCard(
     val isFocused by interactionSource.collectIsFocusedAsState()
     val isError = !point.isValid
 
-    val headerColor = when {
+    val leadingContainerColor = when {
         isFocused -> AppColors.Primary
         isError -> AppColors.Error
         else -> AppColors.SurfaceVariant
     }
     val textColor = if (isFocused || isError) AppColors.OnPrimary else AppColors.OnSurfaceVariant
 
-    Card(
+    SidebarCard(
         modifier = modifier,
-        headerColor = headerColor,
-        headerContent = {
+        leadingContainerColor = leadingContainerColor,
+        leadingContent = {
             if (isError) {
                 Tooltip("Введите вещественное значение для x и y") {
                     Icon(
@@ -186,6 +102,3 @@ fun PointCard(
         }
     )
 }
-
-
-

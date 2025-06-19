@@ -22,6 +22,20 @@ class MainViewModel {
         const val STEPS_PER_POINT = 15
     }
 
+    var showFormula by mutableStateOf(true)
+        private set
+
+    fun updateShowFormula(newValue: Boolean) {
+        showFormula = newValue
+    }
+
+    var showSupportLine by mutableStateOf(true)
+        private set
+
+    fun updateShowSupportLine(newValue: Boolean) {
+        showSupportLine = newValue
+    }
+
     /** Current zoom level applied to the graph view. */
     var scale by mutableStateOf(0.5f)
         private set
