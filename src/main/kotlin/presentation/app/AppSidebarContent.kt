@@ -47,7 +47,7 @@ fun AppSidebarContent(
 
         IconButton(
             imageVector = if (!settings.playAnimation) Icons.Default.PlayArrow else Icons.Default.Pause,
-            tooltipText =  if (!settings.playAnimation) "Включить анимацию" else "Остановить анимацию",
+            tooltipText = if (!settings.playAnimation) "Включить анимацию" else "Остановить анимацию",
             onClick = { settings.updatePlayAnimation(!settings.playAnimation) }
         )
 

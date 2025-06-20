@@ -1,7 +1,10 @@
 package presentation.app
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DrawerState
 import androidx.compose.material.Surface
@@ -11,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
@@ -22,6 +26,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import presentation.components.IconButton
 import presentation.graph.BezierCurveGraph
+import presentation.graph.BezierCurveType
 import presentation.graph.POINT_RADIUS
 import resources.AppColors
 import resources.AppDimensions
@@ -92,87 +97,102 @@ fun AppCanvasContent(
         shape = RoundedCornerShape(AppDimensions.MediumRadius),
         border = BorderStroke(1.dp, AppColors.SurfaceDivider)
     ) {
-        BezierCurveGraph(
-            modifier = Modifier
-                .onSizeChanged { graph.updateCanvasSize(it) }
-                .pointerInput(Unit) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            val change = event.changes.first()
-                            val logicalPoint = screenToModel(
-                                change.position,
-                                graph.origin,
-                                graph.scaledCellSize
-                            )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            BezierCurveGraph(
+                modifier = Modifier
+                    .onSizeChanged { graph.updateCanvasSize(it) }
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                val change = event.changes.first()
+                                val logicalPoint = screenToModel(
+                                    change.position,
+                                    graph.origin,
+                                    graph.scaledCellSize
+                                )
 
-                            pointerDragState.isDraggingGraph = event.buttons.isTertiaryPressed
-                            pointerDragState.isDraggingPoint = event.buttons.isPrimaryPressed
+                                pointerDragState.isDraggingGraph = event.buttons.isTertiaryPressed
+                                pointerDragState.isDraggingPoint = event.buttons.isPrimaryPressed
 
-                            when (event.type) {
-                                PointerEventType.Press -> {
-                                    when {
-                                        event.buttons.isPrimaryPressed -> {
-                                            pointerDragState.draggedPointIndex = points.pointPressed(
-                                                logicalPoint,
-                                                0.2f
-                                            )
-                                            if (pointerDragState.draggedPointIndex == null) {
-                                                points.addPointAt(logicalPoint)
+                                when (event.type) {
+                                    PointerEventType.Press -> {
+                                        when {
+                                            event.buttons.isPrimaryPressed -> {
+                                                pointerDragState.draggedPointIndex = points.pointPressed(
+                                                    logicalPoint,
+                                                    0.2f
+                                                )
+                                                if (pointerDragState.draggedPointIndex == null) {
+                                                    points.addPointAt(logicalPoint)
+                                                }
+                                            }
+
+                                            event.buttons.isSecondaryPressed -> {
+                                                points.removePointAt(logicalPoint)
                                             }
                                         }
+                                    }
 
-                                        event.buttons.isSecondaryPressed -> {
-                                            points.removePointAt(logicalPoint)
+                                    PointerEventType.Move -> {
+                                        when {
+                                            pointerDragState.isDraggingGraph -> {
+                                                val delta = change.position - change.previousPosition
+                                                graph.updatePanningOffset(delta)
+                                            }
+
+                                            pointerDragState.isDraggingPoint -> {
+                                                points.movePoint(pointerDragState.draggedPointIndex, logicalPoint)
+                                            }
                                         }
                                     }
-                                }
 
-                                PointerEventType.Move -> {
-                                    when {
-                                        pointerDragState.isDraggingGraph -> {
-                                            val delta = change.position - change.previousPosition
-                                            graph.updatePanningOffset(delta)
-                                        }
-
-                                        pointerDragState.isDraggingPoint -> {
-                                            points.movePoint(pointerDragState.draggedPointIndex, logicalPoint)
-                                        }
+                                    PointerEventType.Scroll -> {
+                                        val delta = change.scrollDelta.y
+                                        graph.updateScale(delta)
                                     }
-                                }
-
-                                PointerEventType.Scroll -> {
-                                    val delta = change.scrollDelta.y
-                                    graph.updateScale(delta)
                                 }
                             }
                         }
-                    }
+                    },
+                settings = graphSettings,
+                gridColor = AppColors.Divider,
+                cellSize = graph.scaledCellSize,
+                panOffset = graph.panningOffset,
+                controlPoints = points.getControlPointOffsets().map { position ->
+                    modelToScreen(
+                        position,
+                        graph.origin,
+                        graph.scaledCellSize
+                    )
                 },
-            settings = graphSettings,
-            gridColor = AppColors.Divider,
-            cellSize = graph.scaledCellSize,
-            panOffset = graph.panningOffset,
-            controlPoints = points.getControlPointOffsets().map { position ->
-                modelToScreen(
-                    position,
-                    graph.origin,
-                    graph.scaledCellSize
-                )
-            },
-            pointRadius = POINT_RADIUS
-        )
-
-        if (drawerState.isClosed) {
-            IconButton(
-                modifier = Modifier.absolutePadding(
-                    left = AppDimensions.MediumPadding,
-                    top = AppDimensions.MediumPadding
-                ),
-                imageVector = Icons.AutoMirrored.Filled.MenuOpen,
-                tooltipText = "Раскрыть меню",
-                onClick = { coroutineScope.launch { drawerState.open() } }
+                pointRadius = POINT_RADIUS
             )
+
+            if (drawerState.isClosed) {
+                IconButton(
+                    modifier = Modifier.absolutePadding(
+                        left = AppDimensions.MediumPadding,
+                        top = AppDimensions.MediumPadding
+                    ),
+                    imageVector = Icons.AutoMirrored.Filled.MenuOpen,
+                    tooltipText = "Раскрыть меню",
+                    onClick = { coroutineScope.launch { drawerState.open() } }
+                )
+            }
+
+            if (settings.showEquation) {
+                BezierCurveType.Formula(
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    controlPoints = points.getControlPointOffsets(),
+                    t = points.interpolation,
+                    result = points.findBezierPoint()
+                )
+            }
         }
+
     }
 }

@@ -40,13 +40,13 @@ class PointsViewModel {
     }
 
     fun getQuadraticSupportLinePoints(): List<Offset>? {
-        return if (controlPoints.size > 2) List(getControlPointOffsets().size - 1) {
+        return if (getControlPointOffsets().size > 2) List(getControlPointOffsets().size - 1) {
             findBezierPoint(getControlPointOffsets().subList(it, it + 2))
         } else null
     }
 
     fun getCubicSupportLinePoints(): List<Offset>? {
-        return if (controlPoints.size > 3) List(getQuadraticSupportLinePoints()!!.size - 1) {
+        return if (getControlPointOffsets().size > 3) List(getQuadraticSupportLinePoints()!!.size - 1) {
             findBezierPoint(getQuadraticSupportLinePoints()!!.subList(it, it + 2))
         } else null
     }
