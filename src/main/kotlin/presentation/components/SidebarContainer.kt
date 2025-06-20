@@ -15,7 +15,7 @@ import resources.AppDimensions
 
 @Composable
 fun SidebarContainer(
-    drawerContent: @Composable ColumnScope.() -> Unit,
+    sidebarContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     drawerState: DrawerState,
     drawerElevation: Dp = DrawerDefaults.Elevation,
@@ -32,7 +32,7 @@ fun SidebarContainer(
                 shape = RoundedCornerShape(AppDimensions.MediumRadius),
                 border = BorderStroke(1.dp, AppColors.SurfaceDivider)
             ) {
-                Column { drawerContent() }
+                Column { sidebarContent() }
             }
         }
 

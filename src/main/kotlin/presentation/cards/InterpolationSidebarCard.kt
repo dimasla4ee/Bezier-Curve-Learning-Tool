@@ -25,7 +25,8 @@ fun InterpolationSidebarCard(
                 text = "t",
                 fontStyle = FontStyle.Italic,
                 fontFamily = FontFamily.Serif,
-                fontSize = AppDimensions.RegularText
+                fontSize = AppDimensions.RegularText,
+                color = AppColors.OnSurfaceVariant
             )
         },
         content = {
