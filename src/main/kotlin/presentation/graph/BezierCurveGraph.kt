@@ -14,11 +14,10 @@ fun BezierCurveGraph(
     modifier: Modifier = Modifier,
     controlPoints: List<Offset>,    // Points to be drawn
     pointRadius: Float,
-    graphPoints: List<Offset>,      // Key points used to draw a graph
     cellSize: Float,
     panOffset: Offset,
     gridColor: Color = Color.Gray,
-    gridStrokeWidth: Float = Stroke.HairlineWidth,
+    strokeWidth: Float = Stroke.HairlineWidth,
     axisStyle: AxisStyle = AxisStyle.Axis
 ) {
     Canvas(
@@ -28,11 +27,14 @@ fun BezierCurveGraph(
             cellSize = cellSize,
             panOffset = panOffset,
             color = gridColor,
-            strokeWidth = gridStrokeWidth,
+            strokeWidth = strokeWidth,
             axisStyle = axisStyle
         )
 
-        drawCurve(graphPoints)
+        drawCurve(
+            curvePoints = controlPoints,
+            strokeWidth = 2f
+        )
 
         if (controlPoints.size > 2) {
             drawLine(
@@ -111,14 +113,15 @@ fun DrawScope.drawGrid(
 }
 
 fun DrawScope.drawCurve(
-    curvePoints: List<Offset>
+    curvePoints: List<Offset>,
+    strokeWidth: Float = 1f,
+    color: Color = Color.Blue
 ) {
-    for (i in 0..<curvePoints.lastIndex) {
-        drawLine(
-            color = Color.Blue,
-            start = curvePoints[i],
-            end = curvePoints[i + 1],
-            strokeWidth = 2f
-        )
-    }
+    val path = BezierCurveType.getPath(curvePoints) ?: return
+
+    drawPath(
+        path = path,
+        color = color,
+        style = Stroke(strokeWidth)
+    )
 }

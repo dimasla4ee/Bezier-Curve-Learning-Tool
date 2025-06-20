@@ -22,35 +22,6 @@ class PointsViewModel {
     val controlPoints = mutableStateListOf<EditablePoint>()
 
     /**
-     * Generates a list of points along the Bézier curve based on current control points.
-     * Returns an empty list if any point in null or fewer than two are defined.
-     */
-    private val graphPoints: MutableList<Offset>
-        get() {
-            val parsedControlPoints = getControlPointOffsets()
-            val containsInvalidPoints = parsedControlPoints.size != controlPoints.size
-            val notEnoughPoints = parsedControlPoints.size < 2
-
-            if (containsInvalidPoints || notEnoughPoints) {
-                return mutableListOf()
-            }
-
-            val n = parsedControlPoints.lastIndex
-            val steps = (STEPS_PER_POINT * n).coerceAtLeast(2)
-
-            val result = mutableStateListOf<Offset>()
-
-            for (tStep in 0..steps) {
-                val t = tStep / steps.toFloat()
-                val point = findBezierPoint(t, parsedControlPoints)
-
-                result.add(point)
-            }
-
-            return result
-        }
-
-    /**
      * Calculates a single point on a Bézier curve at a given parameter [t] using De Casteljau algorithm.
      *
      * @param t normalized time parameter between 0 and 1.
@@ -67,9 +38,6 @@ class PointsViewModel {
 
         return point
     }
-
-    /** Returns the list of [Offset] for calculated Bézier curve points. */
-    fun getGraphPointOffsets(): List<Offset> = graphPoints
 
     /**
      * Determines if a control point is pressed within a given radius.
@@ -181,7 +149,5 @@ class PointsViewModel {
         /** Maximum number of control points. */
         const val POINTS_CAP = 4
 
-        /** Number of curve steps per control point (controls smoothness). */
-        const val STEPS_PER_POINT = 15
     }
 }

@@ -106,14 +106,7 @@ fun AppCanvasContent(
                     graph.scaledCellSize
                 )
             },
-            pointRadius = POINT_RADIUS,
-            graphPoints = points.getGraphPointOffsets().map { position ->
-                modelToScreen(
-                    position,
-                    graph.origin,
-                    graph.scaledCellSize
-                )
-            }
+            pointRadius = POINT_RADIUS
         )
 
         if (drawerState.isClosed) {
