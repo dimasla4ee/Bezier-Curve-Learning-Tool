@@ -15,6 +15,13 @@ class SettingsViewModel {
     var showSupportLine by mutableStateOf(true)
         private set
 
+    var playAnimation by mutableStateOf(false)
+        private set
+
+    fun updatePlayAnimation(newValue: Boolean) {
+        playAnimation = newValue
+    }
+
     /** Updates the [showEquation] flag */
     fun updateShowEquation(newValue: Boolean) {
         showEquation = newValue

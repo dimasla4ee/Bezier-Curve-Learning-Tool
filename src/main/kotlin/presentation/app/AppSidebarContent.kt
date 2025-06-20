@@ -5,6 +5,8 @@ import androidx.compose.material.DrawerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,6 +43,12 @@ fun AppSidebarContent(
             imageVector = Icons.Default.Add,
             tooltipText = "Добавить точку",
             onClick = { points.addPoint() }
+        )
+
+        IconButton(
+            imageVector = if (!settings.playAnimation) Icons.Default.PlayArrow else Icons.Default.Pause,
+            tooltipText =  if (!settings.playAnimation) "Включить анимацию" else "Остановить анимацию",
+            onClick = { settings.updatePlayAnimation(!settings.playAnimation) }
         )
 
         IconButton(

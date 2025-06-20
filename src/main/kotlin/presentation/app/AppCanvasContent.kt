@@ -8,6 +8,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -15,7 +16,9 @@ import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import domain.MainViewModel
+import domain.model.GraphSettings
 import domain.model.PointerDragState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import presentation.components.IconButton
 import presentation.graph.BezierCurveGraph
@@ -34,6 +37,56 @@ fun AppCanvasContent(
     val coroutineScope = rememberCoroutineScope()
     val graph = remember { viewModel.graph }
     val points = remember { viewModel.points }
+    val settings = remember { viewModel.settings }
+    val interpolatedPoint = modelToScreen(
+        points.findBezierPoint(),
+        graph.origin,
+        graph.scaledCellSize
+    )
+    val graphSettings = GraphSettings(
+        interpolatedPoint = interpolatedPoint,
+        quadraticSupportLinePoints = points.getQuadraticSupportLinePoints()?.map {
+            modelToScreen(
+                it,
+                graph.origin,
+                graph.scaledCellSize
+            )
+        },
+        cubicSupportLinePoints = points.getCubicSupportLinePoints()?.map {
+            modelToScreen(
+                it,
+                graph.origin,
+                graph.scaledCellSize
+            )
+        },
+        showEquation = settings.showEquation,
+        showSupportLine = settings.showSupportLine
+    )
+    val playAnimation by remember { settings::playAnimation }
+
+    LaunchedEffect(playAnimation) {
+        if (playAnimation) {
+            var t = points.interpolation
+            var direction = 1
+
+            while (viewModel.settings.playAnimation) {
+                delay(16L)
+
+                t += 0.01f * direction
+
+                if (t >= 1f) {
+                    t = 1f
+                    direction = -1
+                } else if (t <= 0f) {
+                    t = 0f
+                    direction = 1
+                }
+
+                points.updateInterpolation(t)
+            }
+        }
+    }
+
 
     Surface(
         shape = RoundedCornerShape(AppDimensions.MediumRadius),
@@ -96,6 +149,7 @@ fun AppCanvasContent(
                         }
                     }
                 },
+            settings = graphSettings,
             gridColor = AppColors.Divider,
             cellSize = graph.scaledCellSize,
             panOffset = graph.panningOffset,

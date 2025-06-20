@@ -15,28 +15,40 @@ import kotlin.math.pow
 /** ViewModel for handling logical point calculations */
 class PointsViewModel {
 
-    var interpolation by mutableFloatStateOf(0f)
+    var interpolation by mutableFloatStateOf(0.5f)
         private set
 
     /** List of user-editable control points. */
     val controlPoints = mutableStateListOf<EditablePoint>()
 
     /**
-     * Calculates a single point on a Bézier curve at a given parameter [t] using De Casteljau algorithm.
+     * Calculates a single point on a Bézier curve using De Casteljau algorithm.
      *
-     * @param t normalized time parameter between 0 and 1.
-     * @param points list of control points defining the Bézier curve.
-     * @return the point on the curve at position [t].
+     * @param controlPoints list of control points defining the Bézier curve.
+     * @return the point on the curve at position [interpolation].
      */
-    fun findBezierPoint(t: Float, points: List<Offset>): Offset {
+    fun findBezierPoint(controlPoints: List<Offset> = getControlPointOffsets()): Offset {
         var point = Offset.Companion.Zero
-        val n = points.lastIndex
+        val t = interpolation
+        val n = controlPoints.lastIndex
 
         for (i in 0..n) {
-            point += points[i] * binomialCoefficients(n, i).toFloat() * t.pow(i) * (1 - t).pow(n - i)
+            point += controlPoints[i] * binomialCoefficients(n, i).toFloat() * t.pow(i) * (1 - t).pow(n - i)
         }
 
         return point
+    }
+
+    fun getQuadraticSupportLinePoints(): List<Offset>? {
+        return if (controlPoints.size > 2) List(getControlPointOffsets().size - 1) {
+            findBezierPoint(getControlPointOffsets().subList(it, it + 2))
+        } else null
+    }
+
+    fun getCubicSupportLinePoints(): List<Offset>? {
+        return if (controlPoints.size > 3) List(getQuadraticSupportLinePoints()!!.size - 1) {
+            findBezierPoint(getQuadraticSupportLinePoints()!!.subList(it, it + 2))
+        } else null
     }
 
     /**
