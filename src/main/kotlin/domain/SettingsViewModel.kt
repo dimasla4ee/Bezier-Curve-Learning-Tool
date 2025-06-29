@@ -18,6 +18,9 @@ class SettingsViewModel {
     var playAnimation by mutableStateOf(false)
         private set
 
+    var showTheory by mutableStateOf(false)
+        private set
+
     fun updatePlayAnimation(newValue: Boolean) {
         playAnimation = newValue
     }
@@ -30,5 +33,9 @@ class SettingsViewModel {
     /** Updates the [showSupportLine] flag */
     fun updateShowSupportLine(newValue: Boolean) {
         showSupportLine = newValue
+    }
+
+    fun updateShowTheory(newValue: Boolean) {
+        showTheory = newValue
     }
 }

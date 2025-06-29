@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.DrawerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -39,17 +40,28 @@ fun AppSidebarContent(
             ),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(
-            imageVector = Icons.Default.Add,
-            tooltipText = "Добавить точку",
-            onClick = { points.addPoint() }
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            IconButton(
+                imageVector = Icons.Default.Add,
+                tooltipText = "Добавить точку",
+                onClick = { points.addPoint() }
+            )
 
-        IconButton(
-            imageVector = if (!settings.playAnimation) Icons.Default.PlayArrow else Icons.Default.Pause,
-            tooltipText = if (!settings.playAnimation) "Включить анимацию" else "Остановить анимацию",
-            onClick = { settings.updatePlayAnimation(!settings.playAnimation) }
-        )
+            IconButton(
+                imageVector = if (!settings.playAnimation) Icons.Default.PlayArrow else Icons.Default.Pause,
+                tooltipText = if (!settings.playAnimation) "Включить анимацию" else "Остановить анимацию",
+                onClick = { settings.updatePlayAnimation(!settings.playAnimation) }
+            )
+
+            IconButton(
+                imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
+                tooltipText = "О кривых Безье",
+                onClick = { settings.updateShowTheory(true) }
+            )
+        }
+
 
         IconButton(
             imageVector = Icons.AutoMirrored.Filled.MenuOpen,
@@ -76,6 +88,7 @@ fun AppSidebarContent(
         modifier = Modifier
             .width(249.dp)
             .height(50.dp),
+        sliderEnabled = !settings.playAnimation,
         value = points.interpolation,
         onValueChange = { points.updateInterpolation(it) }
     )

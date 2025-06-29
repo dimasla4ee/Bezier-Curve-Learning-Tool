@@ -92,14 +92,12 @@ fun AppCanvasContent(
         }
     }
 
-
     Surface(
         shape = RoundedCornerShape(AppDimensions.MediumRadius),
         border = BorderStroke(1.dp, AppColors.SurfaceDivider)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
+            modifier = Modifier.fillMaxSize()
         ) {
             BezierCurveGraph(
                 modifier = Modifier
@@ -186,7 +184,9 @@ fun AppCanvasContent(
 
             if (settings.showEquation) {
                 BezierCurveType.Formula(
-                    modifier = Modifier.padding(bottom = 16.dp),
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .align(Alignment.BottomCenter),
                     controlPoints = points.getControlPointOffsets(),
                     t = points.interpolation,
                     result = points.findBezierPoint()

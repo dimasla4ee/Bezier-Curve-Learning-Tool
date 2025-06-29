@@ -14,6 +14,7 @@ import resources.AppDimensions
 @Composable
 fun InterpolationSidebarCard(
     modifier: Modifier = Modifier,
+    sliderEnabled: Boolean,
     value: Float,
     onValueChange: (Float) -> Unit
 ) {
@@ -45,6 +46,7 @@ fun InterpolationSidebarCard(
                     fontSize = AppDimensions.RegularText
                 )
                 Slider(
+                    enabled = sliderEnabled,
                     value = value,
                     onValueChange = { onValueChange(it) },
                 )
