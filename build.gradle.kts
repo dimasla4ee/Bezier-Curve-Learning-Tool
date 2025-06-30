@@ -22,6 +22,7 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
+    implementation("ir.mahozad.multiplatform:wavy-slider:2.0.0")
 }
 
 compose.desktop {
