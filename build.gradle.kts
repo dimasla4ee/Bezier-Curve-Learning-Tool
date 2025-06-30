@@ -42,7 +42,7 @@ compose.desktop {
             packageVersion = "1.0.0"
 
             windows {
-                iconFile.set(project.file("src/main/kotlin/composeResources/drawables/iconIco.ico"))
+                iconFile.set(project.file("src/main/composeResources/drawable/iconIco.ico"))
             }
         }
     }
