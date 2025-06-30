@@ -1,8 +1,6 @@
 package presentation.cards
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -15,6 +13,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import resources.AppColors
+import resources.AppDimensions
 
 @Composable
 fun PreferencesSidebarCard(
@@ -36,7 +35,12 @@ fun PreferencesSidebarCard(
             )
         },
         content = {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(AppDimensions.SmallPadding),
+                verticalArrangement = Arrangement.Center
+            ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         modifier = Modifier
