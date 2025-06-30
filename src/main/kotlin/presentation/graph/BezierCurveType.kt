@@ -1,15 +1,17 @@
 package presentation.graph
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
+import resources.AppColors
+import resources.AppStyles
 
 enum class BezierCurveType(val controlPoints: Int) {
     LINEAR(2),
@@ -67,14 +69,13 @@ enum class BezierCurveType(val controlPoints: Int) {
             modifier: Modifier = Modifier,
             controlPoints: List<Offset>,
             t: Float,
-            result: Offset,
-            fontSize: TextUnit = 12.sp
+            result: Offset
         ) {
             val bezierType = BezierCurveType.fromControlPoints(controlPoints.size) ?: return
 
-            val roundedX = String.format("%.2f", result.x)
-            val roundedY = String.format("%.2f", result.y)
-            val roundedT = String.format("%.2f", t)
+            val roundedX = String.format("%.2f", result.x).replace('.', ',')
+            val roundedY = String.format("%.2f", result.y).replace('.', ',')
+            val roundedT = String.format("%.2f", t).replace('.', ',')
 
             val expression = when (bezierType) {
                 LINEAR -> "B($roundedT) = (1 - t)P₀ + tP₁"
@@ -84,15 +85,22 @@ enum class BezierCurveType(val controlPoints: Int) {
 
             val resultStr = " = (${roundedX}; ${roundedY})"
 
-            Text(
+            Surface(
                 modifier = modifier,
-                text = expression + resultStr,
-                fontSize = fontSize,
-                fontFamily = FontFamily.Monospace,
-                fontStyle = FontStyle.Italic,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+                color = AppColors.Primary.copy(alpha = 0.2f),
+                shape = RoundedCornerShape(50.dp)
+            ) {
+                Text(
+                    modifier = Modifier.padding(
+                        vertical = 8.dp,
+                        horizontal = 16.dp
+                    ),
+                    text = expression + resultStr,
+                    style = AppStyles.SMALL_ITALIC_SERIF,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
