@@ -7,7 +7,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import resources.AppDimensions
 
 @Composable
 fun SidebarCard(
@@ -20,25 +19,21 @@ fun SidebarCard(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            Modifier
+        Box(
+            modifier = Modifier
                 .background(leadingContainerColor)
                 .fillMaxHeight()
-                .padding(horizontal = AppDimensions.SmallPadding)
-                .width(18.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .defaultMinSize(minWidth = 34.dp),
+            contentAlignment = Alignment.Center
         ) {
             leadingContent()
         }
 
-        Row(
-            Modifier
+        Box(
+            modifier = Modifier
                 .background(leadingContainerColor.copy(alpha = 0.2f))
-                .padding(horizontal = AppDimensions.SmallPadding)
                 .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            contentAlignment = Alignment.Center
         ) {
             content()
         }

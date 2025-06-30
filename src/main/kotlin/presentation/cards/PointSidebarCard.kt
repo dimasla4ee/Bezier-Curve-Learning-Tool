@@ -2,8 +2,7 @@ package presentation.cards
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -12,9 +11,8 @@ import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import domain.model.EditablePoint
 import presentation.components.IconButton
@@ -23,6 +21,7 @@ import presentation.components.NumericTextField
 import presentation.components.Tooltip
 import resources.AppColors
 import resources.AppDimensions
+import resources.AppStyles
 
 @Composable
 fun PointSidebarCard(
@@ -62,43 +61,66 @@ fun PointSidebarCard(
                     text = "P",
                     index = pointIndex,
                     color = textColor,
-                    fontStyle = FontStyle.Italic,
-                    fontFamily = FontFamily.Serif,
-                    fontSize = AppDimensions.RegularText,
+                    style = AppStyles.REGULAR_ITALIC_SERIF,
                     indexFontSize = AppDimensions.SmallText
                 )
             }
         },
         content = {
-            Text(
-                "x =",
-                fontStyle = FontStyle.Italic,
-                fontFamily = FontFamily.Serif,
-                fontSize = AppDimensions.RegularText
-            )
-            NumericTextField(
-                modifier = Modifier.width(AppDimensions.TextFieldWidth),
-                value = point.xInput,
-                interactionSource = interactionSource,
-                onValueChange = onXChange
-            )
-            Text(
-                "y = ",
-                fontStyle = FontStyle.Italic,
-                fontFamily = FontFamily.Serif,
-                fontSize = AppDimensions.RegularText
-            )
-            NumericTextField(
-                modifier = Modifier.width(AppDimensions.TextFieldWidth),
-                value = point.yInput,
-                interactionSource = interactionSource,
-                onValueChange = onYChange
-            )
-            IconButton(
-                imageVector = Icons.Default.Close,
-                tooltipText = "Удалить точку",
-                onClick = { onClickClose() }
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(AppDimensions.SmallPadding),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                NumericTextFieldWithPrefix(
+                    prefix = "x =",
+                    value = point.xInput,
+                    interactionSource = interactionSource,
+                    onChange = onXChange
+                )
+
+                NumericTextFieldWithPrefix(
+                    prefix = "y =",
+                    value = point.yInput,
+                    interactionSource = interactionSource,
+                    onChange = onYChange
+                )
+
+                IconButton(
+                    imageVector = Icons.Default.Close,
+                    tooltipText = "Удалить точку",
+                    onClick = { onClickClose() }
+                )
+            }
         }
     )
+}
+
+@Composable
+fun NumericTextFieldWithPrefix(
+    prefix: String,
+    value: String,
+    interactionSource: MutableInteractionSource,
+    onChange: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxHeight()
+            .wrapContentWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = prefix,
+            style = AppStyles.REGULAR_ITALIC_SERIF
+        )
+        NumericTextField(
+            modifier = Modifier.width(AppDimensions.TextFieldWidth),
+            value = value,
+            interactionSource = interactionSource,
+            onValueChange = onChange
+        )
+    }
 }
