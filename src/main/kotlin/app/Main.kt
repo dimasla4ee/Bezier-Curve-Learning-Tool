@@ -16,9 +16,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.singleWindowApplication
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import com.example.bezier_curve_learning_tool.generated.resources.Res
+import com.example.bezier_curve_learning_tool.generated.resources.iconPng
 import domain.MainViewModel
 import domain.model.PointerDragState
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 import presentation.app.AppCanvasContent
 import presentation.app.AppSidebarContent
 import presentation.components.AboutBezierCurves
@@ -66,11 +71,16 @@ fun App() {
     }
 }
 
-fun main() = singleWindowApplication(
-    title = "Bezier Curve Learning Tool"
-) {
-    window.minimumSize = Dimension(900, 600)
+@OptIn(ExperimentalResourceApi::class)
+fun main() = application {
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "Bezier Curve Learning Tool",
+        icon = painterResource(Res.drawable.iconPng)
+    ) {
+        window.minimumSize = Dimension(900, 600)
 
-    App()
+        App()
+    }
 }
 

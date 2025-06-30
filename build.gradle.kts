@@ -21,8 +21,15 @@ dependencies {
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
+    implementation(compose.components.resources)
     implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
     implementation("ir.mahozad.multiplatform:wavy-slider:2.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+}
+
+compose.resources {
+    publicResClass = false
+    generateResClass = auto
 }
 
 compose.desktop {
@@ -33,6 +40,10 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "bezier-curve-learning-tool"
             packageVersion = "1.0.0"
+
+            windows {
+                iconFile.set(project.file("src/main/kotlin/composeResources/drawables/iconIco.ico"))
+            }
         }
     }
 }
