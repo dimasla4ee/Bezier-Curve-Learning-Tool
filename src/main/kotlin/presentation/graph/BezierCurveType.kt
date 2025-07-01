@@ -78,9 +78,9 @@ enum class BezierCurveType(val controlPoints: Int) {
             val roundedT = String.format("%.2f", t).replace('.', ',')
 
             val expression = when (bezierType) {
-                LINEAR -> "B($roundedT) = (1 - t)P₀ + tP₁"
-                QUADRATIC -> "B($roundedT) = (1 - t)²P₀ + 2t(1 - t)P₁ + t²P₂"
-                CUBIC -> "B($roundedT) = (1 - t)³P₀ + 3t(1 - t)²P₁ + 3t²(1 - t)P₂ + t³P₃"
+                LINEAR -> "B($roundedT) = (1 − t)P₀ + tP₁"
+                QUADRATIC -> "B($roundedT) = (1 − t)²P₀ + 2t(1 − t)P₁ + t²P₂"
+                CUBIC -> "B($roundedT) = (1 − t)³P₀ + 3t(1 − t)²P₁ + 3t²(1 − t)P₂ + t³P₃"
             }
 
             val resultStr = " = (${roundedX}; ${roundedY})"

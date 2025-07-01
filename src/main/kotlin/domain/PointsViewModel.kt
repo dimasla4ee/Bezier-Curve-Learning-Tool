@@ -119,8 +119,8 @@ class PointsViewModel {
     /** Returns the list of control points as list of [Offset] without nulls. */
     fun getControlPointOffsets(): List<Offset> = controlPoints.mapNotNull { it.offset }
 
-    /** Validates [str] to match a decimal pattern (supports comma as decimal separator). */
-    private fun matchesDecimalPattern(str: String): Boolean = Regex("^-?\\d{0,2}(,\\d{0,2})?$").matches(str)
+    /** Validates [str] to match a decimal pattern (supports both comma and dot as decimal separator). */
+    private fun matchesDecimalPattern(str: String): Boolean = Regex("^-?\\d{0,2}([,.]\\d{0,2})?$").matches(str)
 
     /**
      * Updates the X value of a control point if the input string is valid.

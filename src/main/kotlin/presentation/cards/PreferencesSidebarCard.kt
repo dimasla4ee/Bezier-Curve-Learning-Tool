@@ -49,7 +49,7 @@ fun PreferencesSidebarCard(
                         checked = showEquation,
                         onCheckedChange = { onShowFormulaChange(it) },
                     )
-                    Text("Показать формулу", fontSize = 11.sp)
+                    Text("Показать формулу", fontSize = 12.sp)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
@@ -59,7 +59,7 @@ fun PreferencesSidebarCard(
                         checked = showSupportLine,
                         onCheckedChange = { onShowSupportLineChange(it) },
                     )
-                    Text("Показать вспомогательные линии", fontSize = 11.sp)
+                    Text("Показать вспомогательные линии", fontSize = 12.sp)
                 }
             }
         }

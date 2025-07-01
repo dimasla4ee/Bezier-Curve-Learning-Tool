@@ -4,6 +4,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 object AppDimensions {
+    val TinyText = 12.sp
     val SmallText = 14.sp
     val RegularText = 18.sp
 

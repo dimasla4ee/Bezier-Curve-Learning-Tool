@@ -15,8 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import domain.model.EditablePoint
+import presentation.components.AttachedText
 import presentation.components.IconButton
-import presentation.components.IndexedText
 import presentation.components.NumericTextField
 import presentation.components.Tooltip
 import resources.AppColors
@@ -57,12 +57,12 @@ fun PointSidebarCard(
                     )
                 }
             } else {
-                IndexedText(
-                    text = "P",
-                    index = pointIndex,
-                    color = textColor,
-                    style = AppStyles.REGULAR_ITALIC_SERIF,
-                    indexFontSize = AppDimensions.SmallText
+                AttachedText(
+                    primaryText = "P",
+                    secondaryText = pointIndex.toString(),
+                    textStyle = AppStyles.REGULAR_ITALIC_SERIF.copy(textColor),
+                    indexStyle = AppStyles.TINY_SERIF.copy(textColor),
+                    verticalShift = 2.dp
                 )
             }
         },

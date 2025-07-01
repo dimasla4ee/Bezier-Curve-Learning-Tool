@@ -48,7 +48,7 @@ fun InterpolationSidebarCard(
                 Text(
                     modifier = Modifier.weight(1f),
                     text = "0",
-                    style = AppStyles.SMALL_ITALIC_SERIF.alignCenter()
+                    style = AppStyles.SMALL_SERIF.alignCenter()
                 )
 
                 Column(
@@ -58,7 +58,7 @@ fun InterpolationSidebarCard(
                 ) {
                     Text(
                         text = String.format("%.2f", value).replace('.', ','),
-                        style = AppStyles.SMALL_ITALIC_SERIF
+                        style = AppStyles.SMALL_SERIF
                     )
 
                     WavySlider(
@@ -79,7 +79,7 @@ fun InterpolationSidebarCard(
                 Text(
                     modifier = Modifier.weight(1f),
                     text = "1",
-                    style = AppStyles.SMALL_ITALIC_SERIF.alignCenter()
+                    style = AppStyles.SMALL_SERIF.alignCenter()
                 )
             }
         }
