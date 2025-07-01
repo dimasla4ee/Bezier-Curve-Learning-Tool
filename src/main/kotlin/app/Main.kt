@@ -74,6 +74,7 @@ fun App() {
 @OptIn(ExperimentalResourceApi::class)
 fun main() = application {
     Window(
+        alwaysOnTop = true,
         onCloseRequest = ::exitApplication,
         title = "Bezier Curve Learning Tool",
         icon = painterResource(Res.drawable.iconPng)
